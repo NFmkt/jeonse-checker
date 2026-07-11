@@ -1,0 +1,14 @@
+{
+  "id": "bootmok-newborn",
+  "name": "신생아 특례 버팀목대출",
+  "incomeLimitKrw": 130000000,
+  "dualIncomeLimitKrw": 200000000,
+  "netAssetLimitKrw": 345000000,
+  "depositLimitKrw": {
+    "capital": 500000000,
+    "nonCapital": 400000000
+  },
+  "areaLimitSqm": 85,
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021401.jsp",
+  "verifiedAt": "2026-07-10"
+}

@@ -1,6 +1,7 @@
 import bootmokGeneral from '@/data/products/bootmok-general.json'
 import bootmokYouth from '@/data/products/bootmok-youth.json'
 import bootmokNewlywed from '@/data/products/bootmok-newlywed.json'
+import bootmokNewborn from '@/data/products/bootmok-newborn.json'
 
 export type Applicant = {
   houseDecided: boolean
@@ -146,6 +147,51 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
   if (applicant.annualIncomeKrw > rule.incomeLimitKrw) {
     reasons.push(
       `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(rule.incomeLimitKrw)} 초과`
+    )
+  }
+
+  if (applicant.netAssetKrw > rule.netAssetLimitKrw) {
+    reasons.push(
+      `순자산 ${formatEok(applicant.netAssetKrw)}으로 한도 ${formatEok(rule.netAssetLimitKrw)} 초과`
+    )
+  }
+
+  const depositLimit =
+    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
+  if (applicant.depositKrw > depositLimit) {
+    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
+    reasons.push(
+      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
+    )
+  }
+
+  if (applicant.areaSqm > rule.areaLimitSqm) {
+    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
+  }
+
+  return {
+    productId: rule.id,
+    productName: rule.name,
+    eligible: reasons.length === 0,
+    reasons,
+  }
+}
+
+export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
+  const reasons: string[] = []
+  const rule = bootmokNewborn
+
+  const housingReason = checkHousingOwnership(applicant)
+  if (housingReason) reasons.push(housingReason)
+
+  if (!applicant.hasNewbornWithin2Years) {
+    reasons.push('대출접수일 기준 2년 내 출산·입양 요건에 해당하지 않음')
+  }
+
+  const incomeLimit = applicant.isDualIncome ? rule.dualIncomeLimitKrw : rule.incomeLimitKrw
+  if (applicant.annualIncomeKrw > incomeLimit) {
+    reasons.push(
+      `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(incomeLimit)} 초과`
     )
   }
 

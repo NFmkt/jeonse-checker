@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { checkBootmokGeneral, checkBootmokYouth, checkBootmokNewlywed, type Applicant } from './eligibility'
+import {
+  checkBootmokGeneral,
+  checkBootmokYouth,
+  checkBootmokNewlywed,
+  checkBootmokNewborn,
+  type Applicant,
+} from './eligibility'
 
 const baseApplicant: Applicant = {
   houseDecided: true,
@@ -198,6 +204,65 @@ describe('checkBootmokNewlywed', () => {
 
   it('전용면적이 85㎡를 초과하면 면적 초과 사유를 반환한다', () => {
     const result = checkBootmokNewlywed({ ...newlywedBase, areaSqm: 90 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
+  })
+})
+
+describe('checkBootmokNewborn', () => {
+  const newbornBase: Applicant = {
+    ...baseApplicant,
+    hasNewbornWithin2Years: true,
+    annualIncomeKrw: 120000000,
+  }
+
+  it('모든 조건을 충족하면 eligible: true를 반환한다', () => {
+    const result = checkBootmokNewborn(newbornBase)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('2년 내 출산·입양 요건에 해당하지 않으면 미충족 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, hasNewbornWithin2Years: false })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('대출접수일 기준 2년 내 출산·입양 요건에 해당하지 않음')
+  })
+
+  it('외벌이 소득이 1.3억원을 초과하면 소득 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, annualIncomeKrw: 140000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('소득 14,000만원으로 한도 13,000만원 초과')
+  })
+
+  it('맞벌이면 소득한도가 2억원으로 상향된다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, isDualIncome: true, annualIncomeKrw: 180000000 })
+    expect(result.eligible).toBe(true)
+  })
+
+  it('순자산이 3.45억원을 초과하면 순자산 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, netAssetKrw: 350000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('순자산 3.5억원으로 한도 3.45억원 초과')
+  })
+
+  it('수도권 보증금이 5억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, region: 'capital', depositKrw: 510000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 5.1억원으로 수도권 한도 5억원 초과')
+  })
+
+  it('비수도권 보증금이 4억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({
+      ...newbornBase,
+      region: 'non-capital',
+      depositKrw: 410000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 4.1억원으로 비수도권 한도 4억원 초과')
+  })
+
+  it('전용면적이 85㎡를 초과하면 면적 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewborn({ ...newbornBase, areaSqm: 90 })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
   })
