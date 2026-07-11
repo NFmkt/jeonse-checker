@@ -27,6 +27,7 @@ export type EligibilityResult = {
   productName: string
   eligible: boolean
   reasons: string[]
+  applicable: boolean
 }
 
 function formatEok(krw: number): string {
@@ -83,6 +84,7 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     productName: rule.name,
     eligible: reasons.length === 0,
     reasons,
+    applicable: true,
   }
 }
 
@@ -130,6 +132,7 @@ export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
     productName: rule.name,
     eligible: reasons.length === 0,
     reasons,
+    applicable: true,
   }
 }
 
@@ -174,6 +177,7 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
     productName: rule.name,
     eligible: reasons.length === 0,
     reasons,
+    applicable: true,
   }
 }
 
@@ -219,6 +223,7 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     productName: rule.name,
     eligible: reasons.length === 0,
     reasons,
+    applicable: true,
   }
 }
 

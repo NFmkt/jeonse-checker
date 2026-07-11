@@ -301,3 +301,29 @@ describe('checkAllCoreProducts', () => {
     expect(results.every((r) => r.eligible)).toBe(true)
   })
 })
+
+describe('EligibilityResult.applicable (코어 상품은 항상 true)', () => {
+  it('checkBootmokGeneral 결과는 applicable: true를 포함한다', () => {
+    const result = checkBootmokGeneral(baseApplicant)
+    expect(result.applicable).toBe(true)
+  })
+
+  it('checkBootmokYouth 결과는 applicable: true를 포함한다', () => {
+    const result = checkBootmokYouth({ ...baseApplicant, age: 28 })
+    expect(result.applicable).toBe(true)
+  })
+
+  it('checkBootmokNewlywed 결과는 applicable: true를 포함한다', () => {
+    const result = checkBootmokNewlywed({ ...baseApplicant, isNewlywed: true, annualIncomeKrw: 70000000 })
+    expect(result.applicable).toBe(true)
+  })
+
+  it('checkBootmokNewborn 결과는 applicable: true를 포함한다', () => {
+    const result = checkBootmokNewborn({
+      ...baseApplicant,
+      hasNewbornWithin2Years: true,
+      annualIncomeKrw: 120000000,
+    })
+    expect(result.applicable).toBe(true)
+  })
+})
