@@ -6,8 +6,26 @@
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
 > - 작성일: 2026-07-09 (최종 갱신 2026-07-11)
-> - 상태: **`docs/issues.md` #1(E2E 트레이서) 구현 완료, master에 병합됨**. 다음 작업은 #2(전체 11단계 문답 확장).
+> - 상태: **`docs/issues.md` #1·#2 구현 완료, master에 병합됨**. 다음 작업은 #3(니치 3종 자기신고).
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
+
+---
+
+## 0-3. ✅ 이슈 #2 완료 (2026-07-11)
+
+`superpowers:writing-plans`로 계획서 작성(`docs/superpowers/plans/2026-07-11-issue2-full-questionnaire.md`) →
+`superpowers:subagent-driven-development`로 격리 워크트리에서 Task 1~7 전부 구현·리뷰 승인 완료,
+최종 전체 브랜치 리뷰 "Ready to merge: Yes" 판정 후 master에 fast-forward 병합함.
+
+- 커밋: `6142728`(Applicant확장+무주택게이트+버팀목일반 신혼기준) → `4a2010a`(청년전용) → `e55e635`(신혼부부전용)
+  → `571ef22`(신생아특례) → `a2f3aed`(checkAllCoreProducts 집계) → `c124f5e`(11단계 위저드) → `9e712a8`(페이지조립, 이슈 #2 완성)
+- `npm run build` 성공, `npm test` 37/37 통과
+- 컨트롤러가 직접 브라우저로 11단계 전체 플로우 라이브 검증(4개 상품 모두 "자격 충족" 렌더링, 네트워크 호출 없음, "다시 하기" 정상)
+- **알려진 스코프 단순화(결함 아님, 계획서 Global Constraints에 명시)**: "집 결정여부"·"보유 대출"·"연체이력"은 답변만 수집하고 판정 미사용(공식 판정축 밖). 청년전용 "25세 미만 단독세대주 60㎡" 예외는 나이만으로 판정(세대구성 문항 없음). 니치 3종은 이슈 #3 몫.
+- **최종 리뷰 Important 지적(비블로킹, 추적 필요)**: `app/globals.css`의 Spoqa 폰트 외부 CDN(`spoqa.github.io`) `@import`가 페이지 로드마다 제3자 서버로 요청을 보냄(개인정보 전송은 아니지만 방문자 IP 노출) — 이슈 #1에서 이미 도입됨, **이슈 #5(디자인시스템)에서 자체 호스팅으로 교체 필요**.
+- Minor 지적(선택): 4개 상품 함수 간 reasons 배열 순서 비일관(cosmetic), `formatManwon`의 `toLocaleString()`이 런타임 로케일에 의존(`'ko-KR'` 고정 권장), 청년전용 다자녀2+ elevated tier 및 경계값(정확히 한도) 테스트 미비.
+
+**다음 할 일**: `docs/issues.md` #3(니치 3종 자기신고: 전세피해·갱신만료·주거취약계층 + 판정 통합).
 
 ---
 
