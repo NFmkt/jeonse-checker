@@ -364,3 +364,12 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
     applicable: true,
   }
 }
+
+export function checkAllProducts(applicant: Applicant): EligibilityResult[] {
+  return [
+    ...checkAllCoreProducts(applicant),
+    checkJeonseDamage(applicant),
+    checkRenewalExtension(applicant),
+    checkVulnerableHousing(applicant),
+  ]
+}

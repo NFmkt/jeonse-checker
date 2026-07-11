@@ -8,6 +8,7 @@ import {
   checkJeonseDamage,
   checkRenewalExtension,
   checkVulnerableHousing,
+  checkAllProducts,
   type Applicant,
 } from './eligibility'
 
@@ -478,5 +479,43 @@ describe('checkVulnerableHousing', () => {
     const result = checkVulnerableHousing({ ...vulnerableBase, housingOwnership: 'one-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+})
+
+describe('checkAllProducts', () => {
+  it('코어 4개 + 니치 3개, 정해진 순서로 7개 결과를 반환한다', () => {
+    const results = checkAllProducts(baseApplicant)
+    expect(results).toHaveLength(7)
+    expect(results.map((r) => r.productId)).toEqual([
+      'bootmok-general',
+      'bootmok-youth',
+      'bootmok-newlywed',
+      'bootmok-newborn',
+      'bootmok-jeonse-damage',
+      'bootmok-renewal-extension',
+      'bootmok-vulnerable-housing',
+    ])
+  })
+
+  it('니치 3종을 자기신고하지 않으면 코어 4개는 applicable: true, 니치 3개는 applicable: false다', () => {
+    const results = checkAllProducts(baseApplicant)
+    expect(results.slice(0, 4).every((r) => r.applicable)).toBe(true)
+    expect(results.slice(4).every((r) => !r.applicable)).toBe(true)
+  })
+
+  it('코어+니치 조건을 모두 충족하면 7개 상품 모두 eligible: true를 반환한다', () => {
+    const results = checkAllProducts({
+      ...baseApplicant,
+      age: 30,
+      isNewlywed: true,
+      hasNewbornWithin2Years: true,
+      annualIncomeKrw: 70000000,
+      depositKrw: 80000000,
+      selfReportedJeonseDamage: true,
+      selfReportedRenewalExtension: true,
+      selfReportedVulnerableHousing: true,
+    })
+    expect(results.every((r) => r.applicable)).toBe(true)
+    expect(results.every((r) => r.eligible)).toBe(true)
   })
 })
