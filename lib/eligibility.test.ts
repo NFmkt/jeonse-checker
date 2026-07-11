@@ -7,6 +7,7 @@ import {
   checkAllCoreProducts,
   checkJeonseDamage,
   checkRenewalExtension,
+  checkVulnerableHousing,
   type Applicant,
 } from './eligibility'
 
@@ -416,6 +417,65 @@ describe('checkRenewalExtension', () => {
 
   it('2주택 이상 소유 중이면 무주택 요건 미충족 사유를 반환한다', () => {
     const result = checkRenewalExtension({ ...renewalBase, housingOwnership: 'multi-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+})
+
+describe('checkVulnerableHousing', () => {
+  const vulnerableBase: Applicant = { ...baseApplicant, selfReportedVulnerableHousing: true }
+
+  it('자기신고 체크를 하지 않으면 applicable: false를 반환하고 판정하지 않는다', () => {
+    const result = checkVulnerableHousing({ ...vulnerableBase, selfReportedVulnerableHousing: false })
+    expect(result.applicable).toBe(false)
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('공공임대 거주 중이고 보증금이 50만원 이하이면 eligible: true를 반환한다', () => {
+    const result = checkVulnerableHousing({
+      ...vulnerableBase,
+      housingOwnership: 'public-rental',
+      depositKrw: 400000,
+    })
+    expect(result.applicable).toBe(true)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('공공임대 거주 중이고 보증금이 50만원을 초과하면 미충족 사유를 반환한다', () => {
+    const result = checkVulnerableHousing({
+      ...vulnerableBase,
+      housingOwnership: 'public-rental',
+      depositKrw: 600000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 60만원으로 공공임대 한도 50만원 초과')
+  })
+
+  it('무주택(공공임대 아님)이고 보증금이 1억원 이하이면 eligible: true를 반환한다', () => {
+    const result = checkVulnerableHousing({
+      ...vulnerableBase,
+      housingOwnership: 'none',
+      depositKrw: 80000000,
+    })
+    expect(result.applicable).toBe(true)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('무주택(공공임대 아님)이고 보증금이 1억원을 초과하면 민간임대 한도 초과 사유를 반환한다', () => {
+    const result = checkVulnerableHousing({
+      ...vulnerableBase,
+      housingOwnership: 'none',
+      depositKrw: 110000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 11,000만원으로 민간임대 한도 10,000만원 초과')
+  })
+
+  it('1주택 이상 소유 중이면 무주택 요건 미충족 사유를 반환한다', () => {
+    const result = checkVulnerableHousing({ ...vulnerableBase, housingOwnership: 'one-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })

@@ -1,0 +1,10 @@
+{
+  "id": "bootmok-vulnerable-housing",
+  "name": "주거취약계층 이주지원 버팀목전세자금",
+  "depositLimitKrw": {
+    "publicHousing": 500000,
+    "privateHousing": 100000000
+  },
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021101.jsp",
+  "verifiedAt": "2026-07-10"
+}
