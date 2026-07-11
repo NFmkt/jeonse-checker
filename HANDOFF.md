@@ -5,29 +5,27 @@
 > 이 문서는 **다른 계정/세션에서 작업을 그대로 이어받기 위한** 핸드오프 노트다.
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
-> - 작성일: 2026-07-09 (최종 갱신 2026-07-10)
-> - 상태: **4단계 TDD 구현 착수 직전, 일시 정지 중**. 아래 "0-1. 지금 당장 재개할 것" 참조.
+> - 작성일: 2026-07-09 (최종 갱신 2026-07-11)
+> - 상태: **스펙 충돌 해소 완료 → 4단계 TDD 구현(subagent-driven-development) 착수 직전**.
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
 
 ---
 
-## 0-1. ⏸️ 지금 당장 재개할 것 (2026-07-10 일시정지)
+## 0-1. ✅ 스펙 충돌 해소 (2026-07-11)
 
-1단계~3.5단계, 개발착수 전 리서치까지 전부 완료. `docs/issues.md` #1(E2E 트레이서) 구현을 위해
-`docs/superpowers/plans/2026-07-10-e2e-tracer.md` 계획서까지 작성 완료(`superpowers:writing-plans` 사용).
-**subagent-driven-development로 실행 직전, 사용자가 일시정지 요청**.
+2026-07-10 self-review에서 발견된 충돌(`docs/issues.md` #1의 "핵심 문항 4개" vs 승인기준의
+"보증금·면적 상한 정확 판정")을 사용자에게 재질문하여 해소함.
 
-**정지 사유**: 계획 self-review 중 스펙 충돌 발견 —
-- `docs/issues.md` #1은 "핵심 문항 **4개**(지역/전용면적/연소득/순자산)"라고 명시
-- 그런데 같은 이슈의 승인 기준에는 "**보증금**·면적 상한 기준으로 정확히 판정"이라는 문구가 있음
-- 버팀목(일반)의 보증금 상한을 검증하려면 전세보증금 질문이 하나 더 필요한데 "4개 문항"에는 없음
+**결정: (A) 보증금 질문을 추가해서 5개 문항으로 확장**(지역/전용면적/전세보증금/연소득/순자산).
+승인기준을 완전히 만족시키는 방향.
 
-**재개 시 첫 번째 할 일**: 사용자에게 다시 질문 — 아래 둘 중 선택
-- (A) 보증금 질문을 추가해서 5개 문항으로 확장(승인기준을 완전히 만족)
-- (B) 4개 문항 유지, 보증금 검증은 이슈 #2(전체 11단계 문답)로 미룸(원래 "최소 트레이서" 의도 유지)
+반영 완료:
+- `docs/issues.md` #1 — 문항 4개→5개, 결정 근거 각주 추가
+- `docs/superpowers/plans/2026-07-10-e2e-tracer.md` — Task 2(`Applicant`에 `depositKrw` 추가,
+  `checkBootmokGeneral`에 보증금 상한 판정 로직·테스트 2건 추가, 총 7개 테스트), Task 3(문답에
+  보증금 입력 스텝 추가, 5단계 위저드로 확장), Task 4(수동 확인 절차 문구 갱신)
 
-선택 후 `docs/superpowers/plans/2026-07-10-e2e-tracer.md`의 Task 2(`checkBootmokGeneral` 함수·테스트)와
-Task 3(문답 컴포넌트)을 필요시 수정하고, `superpowers:subagent-driven-development`로 Task 1부터 실행.
+**다음 할 일**: `superpowers:subagent-driven-development`로 계획서 Task 1부터 순서대로 실행.
 
 **현재 git 상태**: 로컬 저장소만 초기화됨(`git init` 완료, baseline 커밋 1개 — 문서 전체).
 **GitHub 원격 저장소는 아직 생성 안 함**(3.5단계에서 NFmkt 조직 계정 사용 확정만 해둔 상태, 실제 repo 생성은 이슈 #7 배포 단계 또는 그 이전 편한 시점에).
