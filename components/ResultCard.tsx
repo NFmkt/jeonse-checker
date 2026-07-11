@@ -1,6 +1,22 @@
 import type { EligibilityResult } from '@/lib/eligibility'
 
 export function ResultCard({ result }: { result: EligibilityResult }) {
+  if (!result.applicable) {
+    return (
+      <div className="bg-white rounded-xl border border-[#ECEFF2] p-4 opacity-60">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold text-[#161B30]">{result.productName}</h3>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#F5F6F7] text-[#8A9099]">
+            비대상
+          </span>
+        </div>
+        <p className="text-sm text-[#8A9099]">
+          특이사항 단계에서 해당 항목을 선택하지 않아 판정하지 않았습니다.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-white rounded-xl border border-[#ECEFF2] p-4">
       <div className="flex items-center justify-between mb-2">

@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import { Questionnaire } from '@/components/Questionnaire'
 import { ResultCard } from '@/components/ResultCard'
-import { checkAllCoreProducts, type Applicant, type EligibilityResult } from '@/lib/eligibility'
+import { checkAllProducts, type Applicant, type EligibilityResult } from '@/lib/eligibility'
 
 export default function Home() {
   const [results, setResults] = useState<EligibilityResult[] | null>(null)
 
   function handleComplete(applicant: Applicant) {
-    setResults(checkAllCoreProducts(applicant))
+    setResults(checkAllProducts(applicant))
   }
 
   return (
