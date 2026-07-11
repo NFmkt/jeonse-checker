@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { checkBootmokGeneral, type Applicant } from './eligibility'
+import { checkBootmokGeneral, checkBootmokYouth, type Applicant } from './eligibility'
 
 const baseApplicant: Applicant = {
   houseDecided: true,
@@ -96,5 +96,59 @@ describe('checkBootmokGeneral', () => {
     const result = checkBootmokGeneral({ ...baseApplicant, isNewlywed: true, annualIncomeKrw: 60000000 })
     expect(result.eligible).toBe(true)
     expect(result.reasons).toEqual([])
+  })
+})
+
+describe('checkBootmokYouth', () => {
+  const youthBase: Applicant = { ...baseApplicant, age: 28 }
+
+  it('모든 조건을 충족하면 eligible: true를 반환한다', () => {
+    const result = checkBootmokYouth(youthBase)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('나이가 19세 미만이면 연령 요건 미충족 사유를 반환한다', () => {
+    const result = checkBootmokYouth({ ...youthBase, age: 18 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('나이 만 18세로 대상 연령(만 19~34세) 밖')
+  })
+
+  it('나이가 35세 이상이면 연령 요건 미충족 사유를 반환한다', () => {
+    const result = checkBootmokYouth({ ...youthBase, age: 35 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('나이 만 35세로 대상 연령(만 19~34세) 밖')
+  })
+
+  it('혁신도시 이전기관 종사자면 소득한도가 6천만원으로 상향된다', () => {
+    const result = checkBootmokYouth({
+      ...youthBase,
+      isInnovationCityOrRedevelopment: true,
+      annualIncomeKrw: 55000000,
+    })
+    expect(result.eligible).toBe(true)
+  })
+
+  it('신혼이면 소득한도가 7.5천만원으로 상향된다', () => {
+    const result = checkBootmokYouth({ ...youthBase, isNewlywed: true, annualIncomeKrw: 70000000 })
+    expect(result.eligible).toBe(true)
+  })
+
+  it('25세 미만이면 전용면적 한도가 60㎡로 적용된다', () => {
+    const result = checkBootmokYouth({ ...youthBase, age: 24, areaSqm: 70 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전용면적 70㎡로 한도 60㎡ 초과')
+  })
+
+  it('보증금이 3억원을 초과하면 지역과 무관하게 미충족 사유를 반환한다', () => {
+    const result = checkBootmokYouth({ ...youthBase, region: 'non-capital', depositKrw: 310000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 3.1억원으로 한도 3억원 초과')
+  })
+
+  it('1주택 이상 소유 중이면 다른 조건과 무관하게 무주택 요건 미충족 사유를 반환한다', () => {
+    const result = checkBootmokYouth({ ...youthBase, housingOwnership: 'one-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })
 })

@@ -1,0 +1,15 @@
+{
+  "id": "bootmok-youth",
+  "name": "청년전용 버팀목전세자금",
+  "ageMin": 19,
+  "ageMax": 34,
+  "incomeLimitKrw": 50000000,
+  "elevatedIncomeLimitKrw": 60000000,
+  "newlywedIncomeLimitKrw": 75000000,
+  "netAssetLimitKrw": 345000000,
+  "depositLimitKrw": 300000000,
+  "areaLimitSqm": 85,
+  "areaLimitSqmUnder25Solo": 60,
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020301.jsp",
+  "verifiedAt": "2026-07-10"
+}

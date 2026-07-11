@@ -1,4 +1,5 @@
 import bootmokGeneral from '@/data/products/bootmok-general.json'
+import bootmokYouth from '@/data/products/bootmok-youth.json'
 
 export type Applicant = {
   houseDecided: boolean
@@ -72,6 +73,53 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
     reasons.push(
       `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
+    )
+  }
+
+  return {
+    productId: rule.id,
+    productName: rule.name,
+    eligible: reasons.length === 0,
+    reasons,
+  }
+}
+
+export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
+  const reasons: string[] = []
+  const rule = bootmokYouth
+
+  const housingReason = checkHousingOwnership(applicant)
+  if (housingReason) reasons.push(housingReason)
+
+  if (applicant.age < rule.ageMin || applicant.age > rule.ageMax) {
+    reasons.push(`나이 만 ${applicant.age}세로 대상 연령(만 ${rule.ageMin}~${rule.ageMax}세) 밖`)
+  }
+
+  const incomeLimit = applicant.isNewlywed
+    ? rule.newlywedIncomeLimitKrw
+    : applicant.isInnovationCityOrRedevelopment || applicant.hasChildrenTwoOrMore
+      ? rule.elevatedIncomeLimitKrw
+      : rule.incomeLimitKrw
+  if (applicant.annualIncomeKrw > incomeLimit) {
+    reasons.push(
+      `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(incomeLimit)} 초과`
+    )
+  }
+
+  if (applicant.netAssetKrw > rule.netAssetLimitKrw) {
+    reasons.push(
+      `순자산 ${formatEok(applicant.netAssetKrw)}으로 한도 ${formatEok(rule.netAssetLimitKrw)} 초과`
+    )
+  }
+
+  const areaLimit = applicant.age < 25 ? rule.areaLimitSqmUnder25Solo : rule.areaLimitSqm
+  if (applicant.areaSqm > areaLimit) {
+    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${areaLimit}㎡ 초과`)
+  }
+
+  if (applicant.depositKrw > rule.depositLimitKrw) {
+    reasons.push(
+      `전세보증금 ${formatEok(applicant.depositKrw)}으로 한도 ${formatEok(rule.depositLimitKrw)} 초과`
     )
   }
 
