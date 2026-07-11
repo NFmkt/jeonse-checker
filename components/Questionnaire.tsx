@@ -61,6 +61,9 @@ export function Questionnaire({ onComplete }: Props) {
   const [isSmeEmployeeOrFounder, setIsSmeEmployeeOrFounder] = useState(false)
   const [isInnovationCityOrRedevelopment, setIsInnovationCityOrRedevelopment] = useState(false)
   const [hasDelinquencyHistory, setHasDelinquencyHistory] = useState(false)
+  const [selfReportedJeonseDamage, setSelfReportedJeonseDamage] = useState(false)
+  const [selfReportedRenewalExtension, setSelfReportedRenewalExtension] = useState(false)
+  const [selfReportedVulnerableHousing, setSelfReportedVulnerableHousing] = useState(false)
   const [ageInput, setAgeInput] = useState('')
 
   const step: Step = STEPS[stepIndex]
@@ -83,6 +86,9 @@ export function Questionnaire({ onComplete }: Props) {
         isSmeEmployeeOrFounder,
         isInnovationCityOrRedevelopment,
         hasDelinquencyHistory,
+        selfReportedJeonseDamage,
+        selfReportedRenewalExtension,
+        selfReportedVulnerableHousing,
         age: Number(ageInput),
       })
       return
@@ -275,7 +281,7 @@ export function Questionnaire({ onComplete }: Props) {
           <legend className="text-lg font-semibold text-[#161B30] mb-4">
             해당하는 특이사항을 모두 선택해주세요
           </legend>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <ToggleButton
               active={isSmeEmployeeOrFounder}
               onClick={() => setIsSmeEmployeeOrFounder((v) => !v)}
@@ -294,6 +300,39 @@ export function Questionnaire({ onComplete }: Props) {
             >
               연체·부도 이력 있음
             </ToggleButton>
+            <div className="flex flex-col gap-1">
+              <ToggleButton
+                active={selfReportedJeonseDamage}
+                onClick={() => setSelfReportedJeonseDamage((v) => !v)}
+              >
+                전세피해 임차인에 해당해요
+              </ToggleButton>
+              <p className="text-xs text-[#8A9099] px-1">
+                전세사기피해 확인서 대상 여부는 관할 기관에서 최종 확인됩니다.
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <ToggleButton
+                active={selfReportedRenewalExtension}
+                onClick={() => setSelfReportedRenewalExtension((v) => !v)}
+              >
+                갱신만료 임차인 지원 대상에 해당해요
+              </ToggleButton>
+              <p className="text-xs text-[#8A9099] px-1">
+                지침 대상 여부는 관할 기관에서 최종 확인됩니다.
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <ToggleButton
+                active={selfReportedVulnerableHousing}
+                onClick={() => setSelfReportedVulnerableHousing((v) => !v)}
+              >
+                주거취약계층 이주지원 대상에 해당해요
+              </ToggleButton>
+              <p className="text-xs text-[#8A9099] px-1">
+                지침 대상 여부는 관할 기관에서 최종 확인됩니다.
+              </p>
+            </div>
           </div>
         </fieldset>
       )}
