@@ -2,6 +2,7 @@ import bootmokGeneral from '@/data/products/bootmok-general.json'
 import bootmokYouth from '@/data/products/bootmok-youth.json'
 import bootmokNewlywed from '@/data/products/bootmok-newlywed.json'
 import bootmokNewborn from '@/data/products/bootmok-newborn.json'
+import bootmokJeonseDamage from '@/data/products/bootmok-jeonse-damage.json'
 
 export type Applicant = {
   houseDecided: boolean
@@ -20,6 +21,9 @@ export type Applicant = {
   isInnovationCityOrRedevelopment: boolean
   hasDelinquencyHistory: boolean
   age: number
+  selfReportedJeonseDamage: boolean
+  selfReportedRenewalExtension: boolean
+  selfReportedVulnerableHousing: boolean
 }
 
 export type EligibilityResult = {
@@ -234,4 +238,53 @@ export function checkAllCoreProducts(applicant: Applicant): EligibilityResult[] 
     checkBootmokNewlywed(applicant),
     checkBootmokNewborn(applicant),
   ]
+}
+
+export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
+  const rule = bootmokJeonseDamage
+
+  if (!applicant.selfReportedJeonseDamage) {
+    return {
+      productId: rule.id,
+      productName: rule.name,
+      eligible: false,
+      reasons: [],
+      applicable: false,
+    }
+  }
+
+  const reasons: string[] = []
+
+  const housingReason = checkHousingOwnership(applicant)
+  if (housingReason) reasons.push(housingReason)
+
+  if (applicant.annualIncomeKrw > rule.incomeLimitKrw) {
+    reasons.push(
+      `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(rule.incomeLimitKrw)} 초과`
+    )
+  }
+
+  if (applicant.netAssetKrw > rule.netAssetLimitKrw) {
+    reasons.push(
+      `순자산 ${formatEok(applicant.netAssetKrw)}으로 한도 ${formatEok(rule.netAssetLimitKrw)} 초과`
+    )
+  }
+
+  if (applicant.depositKrw > rule.depositLimitKrw) {
+    reasons.push(
+      `전세보증금 ${formatEok(applicant.depositKrw)}으로 한도 ${formatEok(rule.depositLimitKrw)} 초과`
+    )
+  }
+
+  if (applicant.areaSqm > rule.areaLimitSqm) {
+    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
+  }
+
+  return {
+    productId: rule.id,
+    productName: rule.name,
+    eligible: reasons.length === 0,
+    reasons,
+    applicable: true,
+  }
 }

@@ -5,6 +5,7 @@ import {
   checkBootmokNewlywed,
   checkBootmokNewborn,
   checkAllCoreProducts,
+  checkJeonseDamage,
   type Applicant,
 } from './eligibility'
 
@@ -25,6 +26,9 @@ const baseApplicant: Applicant = {
   isInnovationCityOrRedevelopment: false,
   hasDelinquencyHistory: false,
   age: 40,
+  selfReportedJeonseDamage: false,
+  selfReportedRenewalExtension: false,
+  selfReportedVulnerableHousing: false,
 }
 
 describe('checkBootmokGeneral', () => {
@@ -325,5 +329,53 @@ describe('EligibilityResult.applicable (코어 상품은 항상 true)', () => {
       annualIncomeKrw: 120000000,
     })
     expect(result.applicable).toBe(true)
+  })
+})
+
+describe('checkJeonseDamage', () => {
+  const damageBase: Applicant = { ...baseApplicant, selfReportedJeonseDamage: true }
+
+  it('자기신고 체크를 하지 않으면 applicable: false를 반환하고 판정하지 않는다', () => {
+    const result = checkJeonseDamage({ ...damageBase, selfReportedJeonseDamage: false })
+    expect(result.applicable).toBe(false)
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('자기신고 체크 후 모든 조건을 충족하면 applicable: true, eligible: true를 반환한다', () => {
+    const result = checkJeonseDamage(damageBase)
+    expect(result.applicable).toBe(true)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('연소득이 1.3억원을 초과하면 소득 초과 사유를 반환한다', () => {
+    const result = checkJeonseDamage({ ...damageBase, annualIncomeKrw: 140000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('소득 14,000만원으로 한도 13,000만원 초과')
+  })
+
+  it('순자산이 5.11억원을 초과하면 순자산 초과 사유를 반환한다', () => {
+    const result = checkJeonseDamage({ ...damageBase, netAssetKrw: 520000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('순자산 5.2억원으로 한도 5.11억원 초과')
+  })
+
+  it('보증금이 3억원을 초과하면 지역과 무관하게 미충족 사유를 반환한다', () => {
+    const result = checkJeonseDamage({ ...damageBase, region: 'non-capital', depositKrw: 310000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 3.1억원으로 한도 3억원 초과')
+  })
+
+  it('전용면적이 85㎡를 초과하면 면적 초과 사유를 반환한다', () => {
+    const result = checkJeonseDamage({ ...damageBase, areaSqm: 90 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
+  })
+
+  it('1주택 이상 소유 중이면 무주택 요건 미충족 사유를 반환한다', () => {
+    const result = checkJeonseDamage({ ...damageBase, housingOwnership: 'one-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })
 })

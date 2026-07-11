@@ -1,0 +1,10 @@
+{
+  "id": "bootmok-jeonse-damage",
+  "name": "전세피해 임차인 버팀목전세자금",
+  "incomeLimitKrw": 130000000,
+  "netAssetLimitKrw": 511000000,
+  "depositLimitKrw": 300000000,
+  "areaLimitSqm": 85,
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021201.jsp",
+  "verifiedAt": "2026-07-10"
+}
