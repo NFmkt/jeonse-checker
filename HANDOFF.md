@@ -6,8 +6,24 @@
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
 > - 작성일: 2026-07-09 (최종 갱신 2026-07-11)
-> - 상태: **스펙 충돌 해소 완료 → 4단계 TDD 구현(subagent-driven-development) 착수 직전**.
+> - 상태: **`docs/issues.md` #1(E2E 트레이서) 구현 완료, master에 병합됨**. 다음 작업은 #2(전체 11단계 문답 확장).
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
+
+---
+
+## 0-2. ✅ 이슈 #1 완료 (2026-07-11)
+
+`superpowers:subagent-driven-development`로 격리 워크트리에서 Task 1~4 전부 구현·리뷰 승인 완료,
+최종 전체 브랜치 리뷰 "Ready to merge: Yes" 판정 후 master에 fast-forward 병합함.
+
+- 커밋: `d0b72eb`(스캐폴딩) → `b4c970d`(자격판정 순수함수+JSON, 테스트 7개) → `d9493bd`(5단계 문답 위저드)
+  → `a55174b`(결과화면 조립, 이슈 #1 완성)
+- `npm run build` 성공, `npm test` 7/7 통과, 네트워크 호출 0건(개인정보 미전송) 확인됨
+- 사소한 후속 메모(블로킹 아님): Spoqa 폰트가 외부 CDN(`spoqa.github.io`) `@import` — 이슈 #5(디자인 시스템)에서 자체 호스팅 고려. 경계값(정확히 한도 값) 테스트 미비 — 선택사항.
+- Next.js 버전은 계획서의 15가 아닌 16.2.10로 스캐폴딩됨(create-next-app@latest 결과) — 이후 이슈 작업 시 참고.
+
+**다음 할 일**: `docs/issues.md` #2(전체 11단계 문답 확장, 코어 4개 상품) 착수. 착수 전 별도 리서치(대출한도·금리 range,
+HANDOFF 1장 5번)는 #2~#3 진행에는 불필요, #4에서 필요.
 
 ---
 
