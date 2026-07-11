@@ -4,6 +4,7 @@ import {
   checkBootmokYouth,
   checkBootmokNewlywed,
   checkBootmokNewborn,
+  checkAllCoreProducts,
   type Applicant,
 } from './eligibility'
 
@@ -265,5 +266,38 @@ describe('checkBootmokNewborn', () => {
     const result = checkBootmokNewborn({ ...newbornBase, areaSqm: 90 })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
+  })
+})
+
+describe('checkAllCoreProducts', () => {
+  it('4개 상품 결과를 정해진 순서(일반→청년→신혼부부→신생아특례)로 반환한다', () => {
+    const results = checkAllCoreProducts(baseApplicant)
+    expect(results).toHaveLength(4)
+    expect(results.map((r) => r.productId)).toEqual([
+      'bootmok-general',
+      'bootmok-youth',
+      'bootmok-newlywed',
+      'bootmok-newborn',
+    ])
+  })
+
+  it('무주택 요건을 미충족하면 4개 상품 모두 eligible: false를 반환한다', () => {
+    const results = checkAllCoreProducts({ ...baseApplicant, housingOwnership: 'one-house' })
+    expect(results.every((r) => !r.eligible)).toBe(true)
+    expect(results.every((r) => r.reasons.includes('무주택 요건 미충족(현재 주택을 소유하고 있어요)'))).toBe(
+      true
+    )
+  })
+
+  it('신혼+신생아 조건을 함께 충족하면 4개 상품 모두 eligible: true가 될 수 있다', () => {
+    const results = checkAllCoreProducts({
+      ...baseApplicant,
+      age: 30,
+      isNewlywed: true,
+      hasNewbornWithin2Years: true,
+      annualIncomeKrw: 70000000,
+      depositKrw: 250000000,
+    })
+    expect(results.every((r) => r.eligible)).toBe(true)
   })
 })

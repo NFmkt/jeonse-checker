@@ -221,3 +221,12 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     reasons,
   }
 }
+
+export function checkAllCoreProducts(applicant: Applicant): EligibilityResult[] {
+  return [
+    checkBootmokGeneral(applicant),
+    checkBootmokYouth(applicant),
+    checkBootmokNewlywed(applicant),
+    checkBootmokNewborn(applicant),
+  ]
+}
