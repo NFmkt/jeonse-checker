@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { checkBootmokGeneral, checkBootmokYouth, type Applicant } from './eligibility'
+import { checkBootmokGeneral, checkBootmokYouth, checkBootmokNewlywed, type Applicant } from './eligibility'
 
 const baseApplicant: Applicant = {
   houseDecided: true,
@@ -150,5 +150,55 @@ describe('checkBootmokYouth', () => {
     const result = checkBootmokYouth({ ...youthBase, housingOwnership: 'one-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+})
+
+describe('checkBootmokNewlywed', () => {
+  const newlywedBase: Applicant = { ...baseApplicant, isNewlywed: true, annualIncomeKrw: 70000000 }
+
+  it('모든 조건을 충족하면 eligible: true를 반환한다', () => {
+    const result = checkBootmokNewlywed(newlywedBase)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('신혼부부 요건에 해당하지 않으면 미충족 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({ ...newlywedBase, isNewlywed: false })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('신혼부부(혼인 7년 이내 또는 3개월 내 결혼예정) 요건에 해당하지 않음')
+  })
+
+  it('연소득이 7.5천만원을 초과하면 소득 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({ ...newlywedBase, annualIncomeKrw: 80000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('소득 8,000만원으로 한도 7,500만원 초과')
+  })
+
+  it('순자산이 3.45억원을 초과하면 순자산 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({ ...newlywedBase, netAssetKrw: 350000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('순자산 3.5억원으로 한도 3.45억원 초과')
+  })
+
+  it('수도권 보증금이 4억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({ ...newlywedBase, region: 'capital', depositKrw: 410000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 4.1억원으로 수도권 한도 4억원 초과')
+  })
+
+  it('비수도권 보증금이 3억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({
+      ...newlywedBase,
+      region: 'non-capital',
+      depositKrw: 310000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 3.1억원으로 비수도권 한도 3억원 초과')
+  })
+
+  it('전용면적이 85㎡를 초과하면 면적 초과 사유를 반환한다', () => {
+    const result = checkBootmokNewlywed({ ...newlywedBase, areaSqm: 90 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
   })
 })

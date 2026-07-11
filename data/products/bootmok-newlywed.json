@@ -1,0 +1,13 @@
+{
+  "id": "bootmok-newlywed",
+  "name": "신혼부부전용 전세자금",
+  "incomeLimitKrw": 75000000,
+  "netAssetLimitKrw": 345000000,
+  "depositLimitKrw": {
+    "capital": 400000000,
+    "nonCapital": 300000000
+  },
+  "areaLimitSqm": 85,
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020401.jsp",
+  "verifiedAt": "2026-07-10"
+}
