@@ -2,11 +2,22 @@ import { describe, it, expect } from 'vitest'
 import { checkBootmokGeneral, type Applicant } from './eligibility'
 
 const baseApplicant: Applicant = {
+  houseDecided: true,
   region: 'capital',
   areaSqm: 60,
   depositKrw: 250000000,
+  housingOwnership: 'none',
+  isNewlywed: false,
+  hasChildrenTwoOrMore: false,
+  hasNewbornWithin2Years: false,
+  isDualIncome: false,
   annualIncomeKrw: 40000000,
   netAssetKrw: 100000000,
+  hasExistingLoan: false,
+  isSmeEmployeeOrFounder: false,
+  isInnovationCityOrRedevelopment: false,
+  hasDelinquencyHistory: false,
+  age: 40,
 }
 
 describe('checkBootmokGeneral', () => {
@@ -52,6 +63,7 @@ describe('checkBootmokGeneral', () => {
 
   it('여러 조건을 동시에 초과하면 모든 사유가 배열에 담긴다', () => {
     const result = checkBootmokGeneral({
+      ...baseApplicant,
       region: 'capital',
       areaSqm: 90,
       depositKrw: 320000000,
@@ -60,5 +72,29 @@ describe('checkBootmokGeneral', () => {
     })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toHaveLength(4)
+  })
+
+  it('1주택 이상 소유 중이면 무주택 요건 미충족 사유가 담긴다', () => {
+    const result = checkBootmokGeneral({ ...baseApplicant, housingOwnership: 'one-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+
+  it('2주택 이상 소유 중이어도 무주택 요건 미충족 사유가 담긴다', () => {
+    const result = checkBootmokGeneral({ ...baseApplicant, housingOwnership: 'multi-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+
+  it('공공임대 거주 중이면 무주택으로 간주되어 다른 조건 충족 시 eligible: true', () => {
+    const result = checkBootmokGeneral({ ...baseApplicant, housingOwnership: 'public-rental' })
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('신혼부부면 소득한도가 7.5천만원으로 상향되어 6천만원 소득도 충족한다', () => {
+    const result = checkBootmokGeneral({ ...baseApplicant, isNewlywed: true, annualIncomeKrw: 60000000 })
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
   })
 })

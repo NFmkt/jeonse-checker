@@ -2,6 +2,7 @@
   "id": "bootmok-general",
   "name": "버팀목전세자금(일반)",
   "incomeLimitKrw": 50000000,
+  "newlywedIncomeLimitKrw": 75000000,
   "netAssetLimitKrw": 345000000,
   "depositLimitKrw": {
     "capital": 300000000,

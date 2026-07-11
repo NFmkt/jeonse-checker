@@ -1,11 +1,22 @@
 import bootmokGeneral from '@/data/products/bootmok-general.json'
 
 export type Applicant = {
+  houseDecided: boolean
   region: 'capital' | 'non-capital'
   areaSqm: number
   depositKrw: number
+  housingOwnership: 'none' | 'public-rental' | 'one-house' | 'multi-house'
+  isNewlywed: boolean
+  hasChildrenTwoOrMore: boolean
+  hasNewbornWithin2Years: boolean
+  isDualIncome: boolean
   annualIncomeKrw: number
   netAssetKrw: number
+  hasExistingLoan: boolean
+  isSmeEmployeeOrFounder: boolean
+  isInnovationCityOrRedevelopment: boolean
+  hasDelinquencyHistory: boolean
+  age: number
 }
 
 export type EligibilityResult = {
@@ -23,13 +34,24 @@ function formatManwon(krw: number): string {
   return `${Math.round(krw / 10000).toLocaleString()}만원`
 }
 
+export function checkHousingOwnership(applicant: Applicant): string | null {
+  if (applicant.housingOwnership === 'one-house' || applicant.housingOwnership === 'multi-house') {
+    return '무주택 요건 미충족(현재 주택을 소유하고 있어요)'
+  }
+  return null
+}
+
 export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
   const reasons: string[] = []
   const rule = bootmokGeneral
 
-  if (applicant.annualIncomeKrw > rule.incomeLimitKrw) {
+  const housingReason = checkHousingOwnership(applicant)
+  if (housingReason) reasons.push(housingReason)
+
+  const incomeLimit = applicant.isNewlywed ? rule.newlywedIncomeLimitKrw : rule.incomeLimitKrw
+  if (applicant.annualIncomeKrw > incomeLimit) {
     reasons.push(
-      `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(rule.incomeLimitKrw)} 초과`
+      `소득 ${formatManwon(applicant.annualIncomeKrw)}으로 한도 ${formatManwon(incomeLimit)} 초과`
     )
   }
 
