@@ -6,6 +6,7 @@ import {
   checkBootmokNewborn,
   checkAllCoreProducts,
   checkJeonseDamage,
+  checkRenewalExtension,
   type Applicant,
 } from './eligibility'
 
@@ -375,6 +376,46 @@ describe('checkJeonseDamage', () => {
 
   it('1주택 이상 소유 중이면 무주택 요건 미충족 사유를 반환한다', () => {
     const result = checkJeonseDamage({ ...damageBase, housingOwnership: 'one-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+})
+
+describe('checkRenewalExtension', () => {
+  const renewalBase: Applicant = { ...baseApplicant, selfReportedRenewalExtension: true }
+
+  it('자기신고 체크를 하지 않으면 applicable: false를 반환하고 판정하지 않는다', () => {
+    const result = checkRenewalExtension({ ...renewalBase, selfReportedRenewalExtension: false })
+    expect(result.applicable).toBe(false)
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('자기신고 체크 후 모든 조건을 충족하면 applicable: true, eligible: true를 반환한다', () => {
+    const result = checkRenewalExtension(renewalBase)
+    expect(result.applicable).toBe(true)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('수도권 보증금이 4.5억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkRenewalExtension({ ...renewalBase, region: 'capital', depositKrw: 460000000 })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 4.6억원으로 수도권 한도 4.5억원 초과')
+  })
+
+  it('비수도권 보증금이 2.5억원을 초과하면 보증금 초과 사유를 반환한다', () => {
+    const result = checkRenewalExtension({
+      ...renewalBase,
+      region: 'non-capital',
+      depositKrw: 260000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 2.6억원으로 비수도권 한도 2.5억원 초과')
+  })
+
+  it('2주택 이상 소유 중이면 무주택 요건 미충족 사유를 반환한다', () => {
+    const result = checkRenewalExtension({ ...renewalBase, housingOwnership: 'multi-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })

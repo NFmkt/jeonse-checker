@@ -1,0 +1,10 @@
+{
+  "id": "bootmok-renewal-extension",
+  "name": "갱신만료 임차인 지원 버팀목전세자금",
+  "depositLimitKrw": {
+    "capital": 450000000,
+    "nonCapital": 250000000
+  },
+  "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021002.jsp",
+  "verifiedAt": "2026-07-10"
+}

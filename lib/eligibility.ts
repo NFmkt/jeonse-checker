@@ -3,6 +3,7 @@ import bootmokYouth from '@/data/products/bootmok-youth.json'
 import bootmokNewlywed from '@/data/products/bootmok-newlywed.json'
 import bootmokNewborn from '@/data/products/bootmok-newborn.json'
 import bootmokJeonseDamage from '@/data/products/bootmok-jeonse-damage.json'
+import bootmokRenewalExtension from '@/data/products/bootmok-renewal-extension.json'
 
 export type Applicant = {
   houseDecided: boolean
@@ -278,6 +279,42 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
 
   if (applicant.areaSqm > rule.areaLimitSqm) {
     reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
+  }
+
+  return {
+    productId: rule.id,
+    productName: rule.name,
+    eligible: reasons.length === 0,
+    reasons,
+    applicable: true,
+  }
+}
+
+export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
+  const rule = bootmokRenewalExtension
+
+  if (!applicant.selfReportedRenewalExtension) {
+    return {
+      productId: rule.id,
+      productName: rule.name,
+      eligible: false,
+      reasons: [],
+      applicable: false,
+    }
+  }
+
+  const reasons: string[] = []
+
+  const housingReason = checkHousingOwnership(applicant)
+  if (housingReason) reasons.push(housingReason)
+
+  const depositLimit =
+    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
+  if (applicant.depositKrw > depositLimit) {
+    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
+    reasons.push(
+      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
+    )
   }
 
   return {
