@@ -35,8 +35,10 @@ function ToggleButton({
     <button
       type="button"
       onClick={onClick}
-      className={`h-9 px-4 rounded-full text-sm font-semibold transition-colors ${
-        active ? 'bg-[#25B9B9] text-white' : 'bg-[#F5F6F7] text-[#555B61]'
+      className={`h-9 px-4 rounded-full text-sm font-semibold transition-all duration-200 ease-out active:scale-95 ${
+        active
+          ? 'bg-[#25B9B9] text-white shadow-[0_1px_6px_rgba(37,185,185,0.22)]'
+          : 'bg-[#F5F6F7] text-[#555B61]'
       }`}
     >
       {children}
