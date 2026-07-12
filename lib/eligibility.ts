@@ -36,6 +36,8 @@ export type EligibilityResult = {
   applicable: boolean
   loanLimitText: string
   rateRangeText: string
+  sourceUrl: string
+  verifiedAt: string
 }
 
 function formatEok(krw: number): string {
@@ -95,6 +97,8 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -145,6 +149,8 @@ export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -192,6 +198,8 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -240,6 +248,8 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -264,6 +274,8 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
       applicable: false,
       loanLimitText: '',
       rateRangeText: '',
+      sourceUrl: '',
+      verifiedAt: '',
     }
   }
 
@@ -302,6 +314,8 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -317,6 +331,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
       applicable: false,
       loanLimitText: '',
       rateRangeText: '',
+      sourceUrl: '',
+      verifiedAt: '',
     }
   }
 
@@ -342,6 +358,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -357,6 +375,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
       applicable: false,
       loanLimitText: '',
       rateRangeText: '',
+      sourceUrl: '',
+      verifiedAt: '',
     }
   }
 
@@ -384,6 +404,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
     applicable: true,
     loanLimitText: rule.loanLimitText,
     rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 

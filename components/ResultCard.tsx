@@ -42,6 +42,9 @@ export function ResultCard({ result }: { result: EligibilityResult }) {
         <p className="mt-1.5 text-xs font-semibold text-[#0098D4]">금리</p>
         <p className="text-sm font-extrabold text-[#0098D4]">{result.rateRangeText}</p>
       </div>
+      <p className="mt-3 text-[10px] text-[#8D9399]">
+        출처: <a href={result.sourceUrl} className="underline" target="_blank" rel="noopener noreferrer">주택도시기금포털</a> (확인일: {result.verifiedAt})
+      </p>
     </div>
   )
 }

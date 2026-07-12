@@ -119,6 +119,12 @@ describe('checkBootmokGeneral', () => {
     )
     expect(result.rateRangeText).toBe('연 2.5%~3.5% (우대 중복불가, 최대 -1.0%p)')
   })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkBootmokGeneral(baseApplicant)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp')
+    expect(result.verifiedAt).toBe('2026-07-09')
+  })
 })
 
 describe('checkBootmokYouth', () => {
@@ -183,6 +189,12 @@ describe('checkBootmokYouth', () => {
       '연 2.2%~3.3% (소득구간별, 지방 -0.2%p, 기초우대 최대 -1.0%p)'
     )
   })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkBootmokYouth(youthBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020301.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
+  })
 })
 
 describe('checkBootmokNewlywed', () => {
@@ -242,6 +254,12 @@ describe('checkBootmokNewlywed', () => {
     expect(result.rateRangeText).toBe(
       '연 1.9%~3.3% (소득×보증금 매트릭스, 지방 -0.2%p, 다자녀 최대 -0.7%p)'
     )
+  })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkBootmokNewlywed(newlywedBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020401.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
   })
 })
 
@@ -309,6 +327,12 @@ describe('checkBootmokNewborn', () => {
     expect(result.rateRangeText).toBe(
       '연 1.3%~4.3% (소득 구간별 특례금리, 우대 최대 -0.5%p)'
     )
+  })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkBootmokNewborn(newbornBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021401.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
   })
 })
 
@@ -425,6 +449,12 @@ describe('checkJeonseDamage', () => {
       '연 1.2%~2.7% (소득×보증금 매트릭스, 다자녀 최대 -0.7%p)'
     )
   })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkJeonseDamage(damageBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021201.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
+  })
 })
 
 describe('checkRenewalExtension', () => {
@@ -472,6 +502,12 @@ describe('checkRenewalExtension', () => {
     expect(result.rateRangeText).toBe(
       '공식 미확인 — 원문에 구체 수치 없음, "신청자격에 따른 금리 적용"만 명시'
     )
+  })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkRenewalExtension(renewalBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021002.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
   })
 })
 
@@ -539,6 +575,12 @@ describe('checkVulnerableHousing', () => {
     expect(result.rateRangeText).toBe(
       '공공임대: 연 0%(5천만 한도)~1.2~1.8%(초과분). 민간임대: 공식 미확인'
     )
+  })
+
+  it('결과에 출처 URL과 확인일자가 포함된다', () => {
+    const result = checkVulnerableHousing(vulnerableBase)
+    expect(result.sourceUrl).toBe('https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021101.jsp')
+    expect(result.verifiedAt).toBe('2026-07-10')
   })
 })
 
