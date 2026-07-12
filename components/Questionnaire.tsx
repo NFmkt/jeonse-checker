@@ -307,7 +307,7 @@ export function Questionnaire({ onComplete }: Props) {
               >
                 전세피해 임차인에 해당해요
               </ToggleButton>
-              <p className="text-xs text-[#8A9099] px-1">
+              <p className="text-xs text-[#8D9399] px-1">
                 전세사기피해 확인서 대상 여부는 관할 기관에서 최종 확인됩니다.
               </p>
             </div>
@@ -318,7 +318,7 @@ export function Questionnaire({ onComplete }: Props) {
               >
                 갱신만료 임차인 지원 대상에 해당해요
               </ToggleButton>
-              <p className="text-xs text-[#8A9099] px-1">
+              <p className="text-xs text-[#8D9399] px-1">
                 지침 대상 여부는 관할 기관에서 최종 확인됩니다.
               </p>
             </div>
@@ -329,7 +329,7 @@ export function Questionnaire({ onComplete }: Props) {
               >
                 주거취약계층 이주지원 대상에 해당해요
               </ToggleButton>
-              <p className="text-xs text-[#8A9099] px-1">
+              <p className="text-xs text-[#8D9399] px-1">
                 지침 대상 여부는 관할 기관에서 최종 확인됩니다.
               </p>
             </div>
