@@ -36,6 +36,12 @@ export function ResultCard({ result }: { result: EligibilityResult }) {
           ))}
         </ul>
       )}
+      <div className="mt-3 rounded-lg bg-[#E9F6FA] px-3 py-2">
+        <p className="text-xs font-semibold text-[#0098D4]">대출한도</p>
+        <p className="text-sm font-extrabold text-[#0098D4]">{result.loanLimitText}</p>
+        <p className="mt-1.5 text-xs font-semibold text-[#0098D4]">금리</p>
+        <p className="text-sm font-extrabold text-[#0098D4]">{result.rateRangeText}</p>
+      </div>
     </div>
   )
 }
