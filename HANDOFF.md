@@ -6,8 +6,35 @@
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
 > - 작성일: 2026-07-09 (최종 갱신 2026-07-12)
-> - 상태: **`docs/issues.md` #1·#2·#3·#4 구현 완료, master에 병합됨**. 다음 작업은 #5(디자인 시스템 전면 적용 + 법적 고지).
+> - 상태: **`docs/issues.md` #1~#5 구현 완료, master에 병합됨**. 다음 작업은 #6(반응형/접근성 QA).
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
+
+---
+
+## 0-6. ✅ 이슈 #5 완료 (2026-07-12)
+
+`superpowers:writing-plans`로 계획서 작성 → `EnterWorktree` 격리 워크트리 → `subagent-driven-development`로
+Task 1~4 구현·리뷰 승인(컬러 토큰 정합성 수정 → 선택 pill 인터랙션 → 법적 고지 2종 → 상품별 출처/확인일자)
+→ 최종 전체 브랜치 리뷰 "Ready to merge: Yes" → master fast-forward 병합(`8a821c4`) → `ExitWorktree` 정리.
+
+- 커밋: `40e6d9e`(컬러 토큰 `#8A9099`→`#8D9399`+globals.css 임의 값 정리) → `d367742`(active:scale+
+  선택 시 그림자) → `9c46309`(정확성 면책+개인정보 비저장 고지) → `eff73bd`(상품 카드 출처+확인일자)
+  → `8a821c4`(issues.md #5 체크리스트 반영)
+- `npm test` 76/76 통과, `npm run build` 성공
+- 컨트롤러가 직접 브라우저로 11단계 전체 플로우 라이브 검증: 개인정보 비저장 고지(상단)+정확성
+  면책(하단) 문구 정확히 노출, 상품별로 다른 출처 URL/확인일자 정상 표시, 비대상 카드는 출처 없음
+- **최종 리뷰 Minor 지적(비블로킹)**: (1) 7개 `check*` 함수의 return 객체 shape 중복이 이슈 #4·#5를
+  거치며 계속 커짐(~10곳, 9필드) — 향후 `buildResult()` 헬퍼로 통합 고려. (2) 자격 배지가
+  `rounded-full`인데 design-system.md는 "작은 배지 4px"로 표기 — 이 브랜치가 만든 회귀는 아니고
+  문서 표현의 모호함.
+- **운영 메모**: Task 1·2 구현 서브에이전트가 이번에도 Bash cd는 워크트리로 정확히 했음에도
+  Edit/Write 툴 호출이 가끔 master 저장소에 동일 내용을 추가로 남김(uncommitted 상태로 발견,
+  워크트리 커밋과 내용 동일해 `git restore`로 정리). 이슈 #4에서 발견한 것과 같은 계열의 문제 —
+  [[feedback_subagent_worktree_cwd]] 메모리 참조. 브라우저 자동화 도구도 이 세션에서 `computer`
+  스크린샷이 반복 타임아웃(도구 자체 이슈로 판단, 앱 결함 아님) — `get_page_text`/`read_page`
+  기반 검증으로 대체해 진행.
+
+**다음 할 일**: `docs/issues.md` #6(반응형/접근성 QA).
 
 ---
 
