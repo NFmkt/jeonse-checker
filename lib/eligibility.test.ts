@@ -417,6 +417,14 @@ describe('checkJeonseDamage', () => {
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
+    const result = checkJeonseDamage({ ...baseApplicant, selfReportedJeonseDamage: true })
+    expect(result.loanLimitText).toBe('2.4억 (호당한도·전세금80%·담보한도 중 최소값)')
+    expect(result.rateRangeText).toBe(
+      '연 1.2%~2.7% (소득×보증금 매트릭스, 다자녀 최대 -0.7%p)'
+    )
+  })
 })
 
 describe('checkRenewalExtension', () => {
@@ -456,6 +464,14 @@ describe('checkRenewalExtension', () => {
     const result = checkRenewalExtension({ ...renewalBase, housingOwnership: 'multi-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다(금리는 공식 미확인)', () => {
+    const result = checkRenewalExtension({ ...baseApplicant, selfReportedRenewalExtension: true })
+    expect(result.loanLimitText).toBe('수도권 4.5억 / 비수도권 2.5억')
+    expect(result.rateRangeText).toBe(
+      '공식 미확인 — 원문에 구체 수치 없음, "신청자격에 따른 금리 적용"만 명시'
+    )
   })
 })
 
@@ -515,6 +531,14 @@ describe('checkVulnerableHousing', () => {
     const result = checkVulnerableHousing({ ...vulnerableBase, housingOwnership: 'one-house' })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
+  })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다(민간임대 금리는 공식 미확인)', () => {
+    const result = checkVulnerableHousing({ ...baseApplicant, selfReportedVulnerableHousing: true })
+    expect(result.loanLimitText).toBe('공공임대 50만원 / 민간임대 1억 이내')
+    expect(result.rateRangeText).toBe(
+      '공공임대: 연 0%(5천만 한도)~1.2~1.8%(초과분). 민간임대: 공식 미확인'
+    )
   })
 })
 

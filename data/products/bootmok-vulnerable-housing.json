@@ -5,6 +5,8 @@
     "publicHousing": 500000,
     "privateHousing": 100000000
   },
+  "loanLimitText": "공공임대 50만원 / 민간임대 1억 이내",
+  "rateRangeText": "공공임대: 연 0%(5천만 한도)~1.2~1.8%(초과분). 민간임대: 공식 미확인",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021101.jsp",
   "verifiedAt": "2026-07-10"
 }

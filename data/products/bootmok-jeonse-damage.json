@@ -5,6 +5,8 @@
   "netAssetLimitKrw": 511000000,
   "depositLimitKrw": 300000000,
   "areaLimitSqm": 85,
+  "loanLimitText": "2.4억 (호당한도·전세금80%·담보한도 중 최소값)",
+  "rateRangeText": "연 1.2%~2.7% (소득×보증금 매트릭스, 다자녀 최대 -0.7%p)",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021201.jsp",
   "verifiedAt": "2026-07-10"
 }

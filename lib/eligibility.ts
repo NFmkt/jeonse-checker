@@ -262,6 +262,8 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
       eligible: false,
       reasons: [],
       applicable: false,
+      loanLimitText: '',
+      rateRangeText: '',
     }
   }
 
@@ -298,6 +300,8 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
@@ -311,6 +315,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
       eligible: false,
       reasons: [],
       applicable: false,
+      loanLimitText: '',
+      rateRangeText: '',
     }
   }
 
@@ -334,6 +340,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
@@ -347,6 +355,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
       eligible: false,
       reasons: [],
       applicable: false,
+      loanLimitText: '',
+      rateRangeText: '',
     }
   }
 
@@ -372,6 +382,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 

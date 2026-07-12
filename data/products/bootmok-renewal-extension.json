@@ -5,6 +5,8 @@
     "capital": 450000000,
     "nonCapital": 250000000
   },
+  "loanLimitText": "수도권 4.5억 / 비수도권 2.5억",
+  "rateRangeText": "공식 미확인 — 원문에 구체 수치 없음, \"신청자격에 따른 금리 적용\"만 명시",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021002.jsp",
   "verifiedAt": "2026-07-10"
 }
