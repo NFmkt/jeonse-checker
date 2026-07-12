@@ -15,7 +15,7 @@
 | `--color-primary-tint-2` | `#F5FBFB` | 카드 내부 섹션 배경 |
 | `--color-text-primary` | `#161B30` | 본문/헤딩 |
 | `--color-text-secondary` | `#555B61` | 보조 텍스트 |
-| `--color-text-muted` | `#8D9399` / `#B1B6BC` | placeholder, 카운트 |
+| `--color-text-muted` | `#6E7479` / `#B1B6BC` | placeholder, 카운트, 본문 보조 텍스트 (이슈 #6에서 `#8D9399`→`#6E7479`로 조정 — WCAG AA 4.5:1 대비 기준 충족을 위해 사용자 승인, 2026-07-12) |
 | `--color-bg` | `#F5F6F7` | 페이지 배경, 비활성 pill |
 | `--color-border` | `#ECEFF2` | 카드/구분선 |
 | `--color-accent-blue` | `#0098D4` / tint `#E9F6FA` | 보조 정보(대출한도 등 수치 강조) |

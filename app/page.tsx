@@ -16,7 +16,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#F5F6F7]">
       {results ? (
         <div className="max-w-[480px] mx-auto px-4 py-8">
-          <p className="mb-4 text-xs text-[#8D9399]">
+          <p className="mb-4 text-xs text-[#6E7479]">
             입력하신 정보는 서버로 전송·저장되지 않으며, 브라우저를 닫거나 새로고침하면 사라집니다.
           </p>
           <div className="flex flex-col gap-3">
@@ -31,7 +31,7 @@ export default function Home() {
           >
             다시 하기
           </button>
-          <p className="mt-4 text-xs text-[#8D9399]">
+          <p className="mt-4 text-xs text-[#6E7479]">
             본 진단 결과는 2026-07 기준 공식 자격요건을 바탕으로 한 참고용 시뮬레이션이며, 실제
             대출 가능 여부는 기금e든든 또는 취급은행의 심사 결과에 따라 다를 수 있습니다.
           </p>
