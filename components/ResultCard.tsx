@@ -6,11 +6,11 @@ export function ResultCard({ result }: { result: EligibilityResult }) {
       <div className="bg-white rounded-xl border border-[#ECEFF2] p-4 opacity-60">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-[#161B30]">{result.productName}</h3>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#F5F6F7] text-[#6E7479]">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#F5F6F7] text-[#686D73]">
             비대상
           </span>
         </div>
-        <p className="text-sm text-[#6E7479]">
+        <p className="text-sm text-[#686D73]">
           특이사항 단계에서 해당 항목을 선택하지 않아 판정하지 않았습니다.
         </p>
       </div>
@@ -42,7 +42,7 @@ export function ResultCard({ result }: { result: EligibilityResult }) {
         <p className="mt-1.5 text-xs font-semibold text-[#0098D4]">금리</p>
         <p className="text-sm font-extrabold text-[#0098D4]">{result.rateRangeText}</p>
       </div>
-      <p className="mt-3 text-[10px] text-[#6E7479]">
+      <p className="mt-3 text-[10px] text-[#686D73]">
         출처: <a href={result.sourceUrl} className="underline" target="_blank" rel="noopener noreferrer">주택도시기금포털</a> (확인일: {result.verifiedAt})
       </p>
     </div>
