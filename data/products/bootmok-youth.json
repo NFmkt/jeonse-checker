@@ -10,6 +10,8 @@
   "depositLimitKrw": 300000000,
   "areaLimitSqm": 85,
   "areaLimitSqmUnder25Solo": 60,
+  "loanLimitText": "일반 1.5억 · 만25세미만 단독세대주 1.2억 (25.6.27 이전 계약은 2억/1.5억)",
+  "rateRangeText": "연 2.2%~3.3% (소득구간별, 지방 -0.2%p, 기초우대 최대 -1.0%p)",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020301.jsp",
   "verifiedAt": "2026-07-10"
 }

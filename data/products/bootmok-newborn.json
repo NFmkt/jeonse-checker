@@ -9,6 +9,8 @@
     "nonCapital": 400000000
   },
   "areaLimitSqm": 85,
+  "loanLimitText": "최대 2.4억 (25.6.27 이전 계약 3억)",
+  "rateRangeText": "연 1.3%~4.3% (소득 구간별 특례금리, 우대 최대 -0.5%p)",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021401.jsp",
   "verifiedAt": "2026-07-10"
 }

@@ -111,6 +111,14 @@ describe('checkBootmokGeneral', () => {
     expect(result.eligible).toBe(true)
     expect(result.reasons).toEqual([])
   })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
+    const result = checkBootmokGeneral(baseApplicant)
+    expect(result.loanLimitText).toBe(
+      '일반 수도권 1.2억/비수도권 8천만 · 신혼·2자녀↑ 수도권 2.5억/비수도권 1.6억'
+    )
+    expect(result.rateRangeText).toBe('연 2.5%~3.5% (우대 중복불가, 최대 -1.0%p)')
+  })
 })
 
 describe('checkBootmokYouth', () => {
@@ -165,6 +173,16 @@ describe('checkBootmokYouth', () => {
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('무주택 요건 미충족(현재 주택을 소유하고 있어요)')
   })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
+    const result = checkBootmokYouth(youthBase)
+    expect(result.loanLimitText).toBe(
+      '일반 1.5억 · 만25세미만 단독세대주 1.2억 (25.6.27 이전 계약은 2억/1.5억)'
+    )
+    expect(result.rateRangeText).toBe(
+      '연 2.2%~3.3% (소득구간별, 지방 -0.2%p, 기초우대 최대 -1.0%p)'
+    )
+  })
 })
 
 describe('checkBootmokNewlywed', () => {
@@ -214,6 +232,16 @@ describe('checkBootmokNewlywed', () => {
     const result = checkBootmokNewlywed({ ...newlywedBase, areaSqm: 90 })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
+  })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
+    const result = checkBootmokNewlywed(newlywedBase)
+    expect(result.loanLimitText).toBe(
+      '수도권 2.5억 · 비수도권 1.6억 (25.6.27 이전 계약은 3억/2억)'
+    )
+    expect(result.rateRangeText).toBe(
+      '연 1.9%~3.3% (소득×보증금 매트릭스, 지방 -0.2%p, 다자녀 최대 -0.7%p)'
+    )
   })
 })
 
@@ -273,6 +301,14 @@ describe('checkBootmokNewborn', () => {
     const result = checkBootmokNewborn({ ...newbornBase, areaSqm: 90 })
     expect(result.eligible).toBe(false)
     expect(result.reasons).toContain('전용면적 90㎡로 한도 85㎡ 초과')
+  })
+
+  it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
+    const result = checkBootmokNewborn(newbornBase)
+    expect(result.loanLimitText).toBe('최대 2.4억 (25.6.27 이전 계약 3억)')
+    expect(result.rateRangeText).toBe(
+      '연 1.3%~4.3% (소득 구간별 특례금리, 우대 최대 -0.5%p)'
+    )
   })
 })
 

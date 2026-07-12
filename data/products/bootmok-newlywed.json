@@ -8,6 +8,8 @@
     "nonCapital": 300000000
   },
   "areaLimitSqm": 85,
+  "loanLimitText": "수도권 2.5억 · 비수도권 1.6억 (25.6.27 이전 계약은 3억/2억)",
+  "rateRangeText": "연 1.9%~3.3% (소득×보증금 매트릭스, 지방 -0.2%p, 다자녀 최대 -0.7%p)",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020401.jsp",
   "verifiedAt": "2026-07-10"
 }

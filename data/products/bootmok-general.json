@@ -9,6 +9,8 @@
     "nonCapital": 200000000
   },
   "areaLimitSqm": 85,
+  "loanLimitText": "일반 수도권 1.2억/비수도권 8천만 · 신혼·2자녀↑ 수도권 2.5억/비수도권 1.6억",
+  "rateRangeText": "연 2.5%~3.5% (우대 중복불가, 최대 -1.0%p)",
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp",
   "verifiedAt": "2026-07-09"
 }

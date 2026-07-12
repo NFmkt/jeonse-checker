@@ -34,6 +34,8 @@ export type EligibilityResult = {
   eligible: boolean
   reasons: string[]
   applicable: boolean
+  loanLimitText: string
+  rateRangeText: string
 }
 
 function formatEok(krw: number): string {
@@ -91,6 +93,8 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
@@ -139,6 +143,8 @@ export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
@@ -184,6 +190,8 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
@@ -230,6 +238,8 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     eligible: reasons.length === 0,
     reasons,
     applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
   }
 }
 
