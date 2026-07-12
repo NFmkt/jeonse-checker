@@ -6,8 +6,33 @@
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
 > - 작성일: 2026-07-09 (최종 갱신 2026-07-12)
-> - 상태: **`docs/issues.md` #1·#2·#3 구현 완료, master에 병합됨**. 다음 작업은 #4(대출한도·금리 range 표시).
+> - 상태: **`docs/issues.md` #1·#2·#3·#4 구현 완료, master에 병합됨**. 다음 작업은 #5(디자인 시스템 전면 적용 + 법적 고지).
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
+
+---
+
+## 0-5. ✅ 이슈 #4 완료 (2026-07-12)
+
+`superpowers:writing-plans`로 계획서 작성(`docs/superpowers/plans/2026-07-12-issue4-loan-limit-rate-range.md`)
+→ `EnterWorktree`로 격리 워크트리 생성 → `superpowers:subagent-driven-development`로 Task 1~3 구현·
+태스크별 리뷰 전부 승인(Task 1은 구현 서브에이전트가 실수로 master에 직접 커밋한 것을 발견해 워크트리
+브랜치로 cherry-pick 이전 후 master를 되돌려 복구) → 최종 전체 브랜치 리뷰 "Ready to merge: Yes" →
+master에 fast-forward 병합(`31d29f0`) → `ExitWorktree`로 워크트리 정리.
+
+- 커밋: `09d5350`(코어4개 상품 필드) → `e46a3cf`(니치3개 상품 필드+공식미확인) → `22708e3`(결과카드 UI)
+  → `31d29f0`(issues.md #4 체크리스트 반영)
+- `npm test` 69/69 통과, `npm run build` 성공
+- 컨트롤러가 직접 브라우저로 라이브 검증(전세피해 체크 시 5개 카드 모두 대출한도·금리 accent-blue
+  박스 정상 렌더링, 갱신만료·주거취약계층은 비대상으로 박스 없이 정상 제외)
+- 최종 리뷰 Minor 지적(비블로킹): 7개 `check*` 함수의 return 객체 shape 중복이 이번 브랜치로 더
+  늘어남(~10곳) — 향후 `buildResult()` 팩토리 등으로 통합 고려 가능하나 지금은 불필요.
+- **운영 메모**: 서브에이전트에게 워크트리 경로로 `cd` 후 작업하라고 프롬프트에 적었는데도 Task 1
+  구현 서브에이전트가 실제로는 master 저장소에 커밋함(harness가 EnterWorktree로 바꾼 세션 cwd를
+  서브에이전트가 상속하지 않는 것으로 보임). 이후 태스크부터는 프롬프트에 "커밋 직전 `git branch
+  --show-current`로 브랜치명 재확인, 아니면 BLOCKED로 중단" 규칙을 추가해 재발 없이 진행함.
+
+**다음 할 일**: `docs/issues.md` #5(디자인 시스템 전면 적용 + 법적 고지, `docs/design-system.md`·
+`SPEC.md` 6장 참조).
 
 ---
 
