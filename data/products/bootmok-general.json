@@ -9,8 +9,15 @@
     "nonCapital": 200000000
   },
   "areaLimitSqm": 85,
-  "loanLimitText": "일반 수도권 1.2억/비수도권 8천만 · 신혼·2자녀↑ 수도권 2.5억/비수도권 1.6억",
-  "rateRangeText": "연 2.5%~3.5% (우대 중복불가, 최대 -1.0%p)",
+  "loanLimitText": [
+    "일반: 수도권 1.2억원 · 비수도권 8천만원",
+    "신혼부부·2자녀 이상: 수도권 2.5억원 · 비수도권 1.6억원"
+  ],
+  "rateRangeText": [
+    "연 2.5%~3.5%",
+    "우대금리 최대 -1.0%p (중복 적용 불가)"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp",
-  "verifiedAt": "2026-07-09"
+  "verifiedAt": "2026-07-09",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }

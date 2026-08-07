@@ -8,6 +8,7 @@ import {
   checkJeonseDamage,
   checkRenewalExtension,
   checkVulnerableHousing,
+  checkGeneralBankLoan,
   checkAllProducts,
   type Applicant,
 } from './eligibility'
@@ -114,10 +115,11 @@ describe('checkBootmokGeneral', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
     const result = checkBootmokGeneral(baseApplicant)
-    expect(result.loanLimitText).toBe(
-      '일반 수도권 1.2억/비수도권 8천만 · 신혼·2자녀↑ 수도권 2.5억/비수도권 1.6억'
-    )
-    expect(result.rateRangeText).toBe('연 2.5%~3.5% (우대 중복불가, 최대 -1.0%p)')
+    expect(result.loanLimitText).toEqual([
+      '일반: 수도권 1.2억원 · 비수도권 8천만원',
+      '신혼부부·2자녀 이상: 수도권 2.5억원 · 비수도권 1.6억원',
+    ])
+    expect(result.rateRangeText).toEqual(['연 2.5%~3.5%', '우대금리 최대 -1.0%p (중복 적용 불가)'])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -182,12 +184,16 @@ describe('checkBootmokYouth', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
     const result = checkBootmokYouth(youthBase)
-    expect(result.loanLimitText).toBe(
-      '일반 1.5억 · 만25세미만 단독세대주 1.2억 (25.6.27 이전 계약은 2억/1.5억)'
-    )
-    expect(result.rateRangeText).toBe(
-      '연 2.2%~3.3% (소득구간별, 지방 -0.2%p, 기초우대 최대 -1.0%p)'
-    )
+    expect(result.loanLimitText).toEqual([
+      '일반: 1.5억원',
+      '만 25세 미만 단독세대주: 1.2억원',
+      '2025년 6월 27일 이전 계약: 2억원 · 1.5억원 (경과조치)',
+    ])
+    expect(result.rateRangeText).toEqual([
+      '연 2.2%~3.3% (소득구간별 차등)',
+      '지방 거주 우대 -0.2%p',
+      '기초생활수급 등 우대 최대 -1.0%p',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -248,12 +254,16 @@ describe('checkBootmokNewlywed', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
     const result = checkBootmokNewlywed(newlywedBase)
-    expect(result.loanLimitText).toBe(
-      '수도권 2.5억 · 비수도권 1.6억 (25.6.27 이전 계약은 3억/2억)'
-    )
-    expect(result.rateRangeText).toBe(
-      '연 1.9%~3.3% (소득×보증금 매트릭스, 지방 -0.2%p, 다자녀 최대 -0.7%p)'
-    )
+    expect(result.loanLimitText).toEqual([
+      '수도권: 2.5억원',
+      '비수도권: 1.6억원',
+      '2025년 6월 27일 이전 계약: 3억원 · 2억원 (경과조치)',
+    ])
+    expect(result.rateRangeText).toEqual([
+      '연 1.9%~3.3% (소득×보증금 구간별 차등)',
+      '지방 거주 우대 -0.2%p',
+      '다자녀 우대 최대 -0.7%p',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -323,10 +333,14 @@ describe('checkBootmokNewborn', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
     const result = checkBootmokNewborn(newbornBase)
-    expect(result.loanLimitText).toBe('최대 2.4억 (25.6.27 이전 계약 3억)')
-    expect(result.rateRangeText).toBe(
-      '연 1.3%~4.3% (소득 구간별 특례금리, 우대 최대 -0.5%p)'
-    )
+    expect(result.loanLimitText).toEqual([
+      '최대 2.4억원',
+      '2025년 6월 27일 이전 계약: 3억원 (경과조치)',
+    ])
+    expect(result.rateRangeText).toEqual([
+      '연 1.3%~4.3% (소득 구간별 특례금리)',
+      '추가 우대 최대 -0.5%p',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -444,10 +458,14 @@ describe('checkJeonseDamage', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다', () => {
     const result = checkJeonseDamage({ ...baseApplicant, selfReportedJeonseDamage: true })
-    expect(result.loanLimitText).toBe('2.4억 (호당한도·전세금80%·담보한도 중 최소값)')
-    expect(result.rateRangeText).toBe(
-      '연 1.2%~2.7% (소득×보증금 매트릭스, 다자녀 최대 -0.7%p)'
-    )
+    expect(result.loanLimitText).toEqual([
+      '최대 2.4억원',
+      '호당 한도, 전세금의 80%, 담보 한도 중 가장 적은 금액 적용',
+    ])
+    expect(result.rateRangeText).toEqual([
+      '연 1.2%~2.7% (소득×보증금 구간별 차등)',
+      '다자녀 우대 최대 -0.7%p',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -498,10 +516,11 @@ describe('checkRenewalExtension', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다(금리는 공식 미확인)', () => {
     const result = checkRenewalExtension({ ...baseApplicant, selfReportedRenewalExtension: true })
-    expect(result.loanLimitText).toBe('수도권 4.5억 / 비수도권 2.5억')
-    expect(result.rateRangeText).toBe(
-      '공식 미확인 — 원문에 구체 수치 없음, "신청자격에 따른 금리 적용"만 명시'
-    )
+    expect(result.loanLimitText).toEqual(['수도권: 4.5억원', '비수도권: 2.5억원'])
+    expect(result.rateRangeText).toEqual([
+      '공식 미확인, 원문에 구체적인 수치는 없음',
+      '신청자격에 따라 금리를 적용한다고만 안내됨',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -571,10 +590,11 @@ describe('checkVulnerableHousing', () => {
 
   it('결과에 대출한도·금리 range 텍스트가 포함된다(민간임대 금리는 공식 미확인)', () => {
     const result = checkVulnerableHousing({ ...baseApplicant, selfReportedVulnerableHousing: true })
-    expect(result.loanLimitText).toBe('공공임대 50만원 / 민간임대 1억 이내')
-    expect(result.rateRangeText).toBe(
-      '공공임대: 연 0%(5천만 한도)~1.2~1.8%(초과분). 민간임대: 공식 미확인'
-    )
+    expect(result.loanLimitText).toEqual(['공공임대: 50만원 이내', '민간임대: 1억원 이내'])
+    expect(result.rateRangeText).toEqual([
+      '공공임대: 5천만원까지 연 0%, 초과분 연 1.2~1.8%',
+      '민간임대: 공식 미확인',
+    ])
   })
 
   it('결과에 출처 URL과 확인일자가 포함된다', () => {
@@ -584,10 +604,66 @@ describe('checkVulnerableHousing', () => {
   })
 })
 
+describe('checkGeneralBankLoan', () => {
+  it('모든 조건을 충족하면 eligible: true를 반환한다', () => {
+    const result = checkGeneralBankLoan(baseApplicant)
+    expect(result.eligible).toBe(true)
+    expect(result.reasons).toEqual([])
+  })
+
+  it('2주택 이상 보유 시 요건 미충족 사유와 함께 eligible: false를 반환한다', () => {
+    const result = checkGeneralBankLoan({ ...baseApplicant, housingOwnership: 'multi-house' })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('본인 및 배우자 합산 1주택 이내 요건 미충족(2주택 이상 보유)')
+  })
+
+  it('1주택 보유자는 소득/자산 제한 없이 eligible: true다', () => {
+    const result = checkGeneralBankLoan({
+      ...baseApplicant,
+      housingOwnership: 'one-house',
+      annualIncomeKrw: 500000000,
+    })
+    expect(result.eligible).toBe(true)
+  })
+
+  it('수도권 보증금이 7억원을 초과하면 보증금 초과 사유와 함께 eligible: false를 반환한다', () => {
+    const result = checkGeneralBankLoan({
+      ...baseApplicant,
+      region: 'capital',
+      depositKrw: 720000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 7.2억원으로 수도권 한도 7억원 초과')
+  })
+
+  it('비수도권 보증금이 5억원을 초과하면 보증금 초과 사유와 함께 eligible: false를 반환한다', () => {
+    const result = checkGeneralBankLoan({
+      ...baseApplicant,
+      region: 'non-capital',
+      depositKrw: 520000000,
+    })
+    expect(result.eligible).toBe(false)
+    expect(result.reasons).toContain('전세보증금 5.2억원으로 비수도권 한도 5억원 초과')
+  })
+
+  it('결과에 대출한도·금리 range 텍스트가 개조식으로 포함되고, 취급은행 리스트는 없다', () => {
+    const result = checkGeneralBankLoan(baseApplicant)
+    expect(result.loanLimitText).toEqual([
+      '임차보증금의 80% 또는 4억원(기존 보증잔액 차감) 중 적은 금액',
+      '상환능력(연소득)에 따라 한도가 줄어들 수 있음',
+    ])
+    expect(result.rateRangeText).toEqual([
+      '은행 자체 변동금리 적용 (소득 제한 없음)',
+      '은행별 차이가 크므로 은행연합회 소비자포털에서 실시간 비교 필요',
+    ])
+    expect(result.bankList).toBeUndefined()
+  })
+})
+
 describe('checkAllProducts', () => {
-  it('코어 4개 + 니치 3개, 정해진 순서로 7개 결과를 반환한다', () => {
+  it('코어 4개 + 니치 3개 + 일반은행 1개, 정해진 순서로 8개 결과를 반환한다', () => {
     const results = checkAllProducts(baseApplicant)
-    expect(results).toHaveLength(7)
+    expect(results).toHaveLength(8)
     expect(results.map((r) => r.productId)).toEqual([
       'bootmok-general',
       'bootmok-youth',
@@ -596,16 +672,18 @@ describe('checkAllProducts', () => {
       'bootmok-jeonse-damage',
       'bootmok-renewal-extension',
       'bootmok-vulnerable-housing',
+      'general-bank-loan',
     ])
   })
 
-  it('니치 3종을 자기신고하지 않으면 코어 4개는 applicable: true, 니치 3개는 applicable: false다', () => {
+  it('니치 3종을 자기신고하지 않으면 코어 4개+일반은행은 applicable: true, 니치 3개는 applicable: false다', () => {
     const results = checkAllProducts(baseApplicant)
     expect(results.slice(0, 4).every((r) => r.applicable)).toBe(true)
-    expect(results.slice(4).every((r) => !r.applicable)).toBe(true)
+    expect(results.slice(4, 7).every((r) => !r.applicable)).toBe(true)
+    expect(results[7].applicable).toBe(true)
   })
 
-  it('코어+니치 조건을 모두 충족하면 7개 상품 모두 eligible: true를 반환한다', () => {
+  it('코어+니치+일반은행 조건을 모두 충족하면 8개 상품 모두 eligible: true를 반환한다', () => {
     const results = checkAllProducts({
       ...baseApplicant,
       age: 30,

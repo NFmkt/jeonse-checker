@@ -10,8 +10,17 @@
   "depositLimitKrw": 300000000,
   "areaLimitSqm": 85,
   "areaLimitSqmUnder25Solo": 60,
-  "loanLimitText": "일반 1.5억 · 만25세미만 단독세대주 1.2억 (25.6.27 이전 계약은 2억/1.5억)",
-  "rateRangeText": "연 2.2%~3.3% (소득구간별, 지방 -0.2%p, 기초우대 최대 -1.0%p)",
+  "loanLimitText": [
+    "일반: 1.5억원",
+    "만 25세 미만 단독세대주: 1.2억원",
+    "2025년 6월 27일 이전 계약: 2억원 · 1.5억원 (경과조치)"
+  ],
+  "rateRangeText": [
+    "연 2.2%~3.3% (소득구간별 차등)",
+    "지방 거주 우대 -0.2%p",
+    "기초생활수급 등 우대 최대 -1.0%p"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020301.jsp",
-  "verifiedAt": "2026-07-10"
+  "verifiedAt": "2026-07-10",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }

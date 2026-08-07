@@ -5,6 +5,7 @@ import bootmokNewborn from '@/data/products/bootmok-newborn.json'
 import bootmokJeonseDamage from '@/data/products/bootmok-jeonse-damage.json'
 import bootmokRenewalExtension from '@/data/products/bootmok-renewal-extension.json'
 import bootmokVulnerableHousing from '@/data/products/bootmok-vulnerable-housing.json'
+import generalBankLoan from '@/data/products/general-bank-loan.json'
 
 export type Applicant = {
   houseDecided: boolean
@@ -34,10 +35,11 @@ export type EligibilityResult = {
   eligible: boolean
   reasons: string[]
   applicable: boolean
-  loanLimitText: string
-  rateRangeText: string
+  loanLimitText: string[]
+  rateRangeText: string[]
   sourceUrl: string
   verifiedAt: string
+  bankList?: string[]
 }
 
 function formatEok(krw: number): string {
@@ -99,6 +101,7 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -151,6 +154,7 @@ export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -200,6 +204,7 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -250,6 +255,7 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -272,8 +278,8 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
       eligible: false,
       reasons: [],
       applicable: false,
-      loanLimitText: '',
-      rateRangeText: '',
+      loanLimitText: [],
+      rateRangeText: [],
       sourceUrl: '',
       verifiedAt: '',
     }
@@ -316,6 +322,7 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -329,8 +336,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
       eligible: false,
       reasons: [],
       applicable: false,
-      loanLimitText: '',
-      rateRangeText: '',
+      loanLimitText: [],
+      rateRangeText: [],
       sourceUrl: '',
       verifiedAt: '',
     }
@@ -360,6 +367,7 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
   }
 }
 
@@ -373,8 +381,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
       eligible: false,
       reasons: [],
       applicable: false,
-      loanLimitText: '',
-      rateRangeText: '',
+      loanLimitText: [],
+      rateRangeText: [],
       sourceUrl: '',
       verifiedAt: '',
     }
@@ -406,6 +414,37 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
     rateRangeText: rule.rateRangeText,
     sourceUrl: rule.sourceUrl,
     verifiedAt: rule.verifiedAt,
+    bankList: rule.bankList,
+  }
+}
+
+export function checkGeneralBankLoan(applicant: Applicant): EligibilityResult {
+  const reasons: string[] = []
+  const rule = generalBankLoan
+
+  if (applicant.housingOwnership === 'multi-house') {
+    reasons.push('본인 및 배우자 합산 1주택 이내 요건 미충족(2주택 이상 보유)')
+  }
+
+  const depositLimit =
+    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
+  if (applicant.depositKrw > depositLimit) {
+    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
+    reasons.push(
+      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
+    )
+  }
+
+  return {
+    productId: rule.id,
+    productName: rule.name,
+    eligible: reasons.length === 0,
+    reasons,
+    applicable: true,
+    loanLimitText: rule.loanLimitText,
+    rateRangeText: rule.rateRangeText,
+    sourceUrl: rule.sourceUrl,
+    verifiedAt: rule.verifiedAt,
   }
 }
 
@@ -415,5 +454,6 @@ export function checkAllProducts(applicant: Applicant): EligibilityResult[] {
     checkJeonseDamage(applicant),
     checkRenewalExtension(applicant),
     checkVulnerableHousing(applicant),
+    checkGeneralBankLoan(applicant),
   ]
 }

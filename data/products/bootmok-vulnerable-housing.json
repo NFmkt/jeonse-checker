@@ -5,8 +5,15 @@
     "publicHousing": 500000,
     "privateHousing": 100000000
   },
-  "loanLimitText": "공공임대 50만원 / 민간임대 1억 이내",
-  "rateRangeText": "공공임대: 연 0%(5천만 한도)~1.2~1.8%(초과분). 민간임대: 공식 미확인",
+  "loanLimitText": [
+    "공공임대: 50만원 이내",
+    "민간임대: 1억원 이내"
+  ],
+  "rateRangeText": [
+    "공공임대: 5천만원까지 연 0%, 초과분 연 1.2~1.8%",
+    "민간임대: 공식 미확인"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021101.jsp",
-  "verifiedAt": "2026-07-10"
+  "verifiedAt": "2026-07-10",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }

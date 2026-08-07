@@ -5,8 +5,15 @@
     "capital": 450000000,
     "nonCapital": 250000000
   },
-  "loanLimitText": "수도권 4.5억 / 비수도권 2.5억",
-  "rateRangeText": "공식 미확인 — 원문에 구체 수치 없음, \"신청자격에 따른 금리 적용\"만 명시",
+  "loanLimitText": [
+    "수도권: 4.5억원",
+    "비수도권: 2.5억원"
+  ],
+  "rateRangeText": [
+    "공식 미확인, 원문에 구체적인 수치는 없음",
+    "신청자격에 따라 금리를 적용한다고만 안내됨"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021002.jsp",
-  "verifiedAt": "2026-07-10"
+  "verifiedAt": "2026-07-10",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }

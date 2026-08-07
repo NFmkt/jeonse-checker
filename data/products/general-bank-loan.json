@@ -1,0 +1,18 @@
+{
+  "id": "general-bank-loan",
+  "name": "시중은행 일반전세자금대출 (HF·HUG 보증)",
+  "depositLimitKrw": {
+    "capital": 700000000,
+    "nonCapital": 500000000
+  },
+  "loanLimitText": [
+    "임차보증금의 80% 또는 4억원(기존 보증잔액 차감) 중 적은 금액",
+    "상환능력(연소득)에 따라 한도가 줄어들 수 있음"
+  ],
+  "rateRangeText": [
+    "은행 자체 변동금리 적용 (소득 제한 없음)",
+    "은행별 차이가 크므로 은행연합회 소비자포털에서 실시간 비교 필요"
+  ],
+  "sourceUrl": "https://www.hf.go.kr/ko/sub02/sub02_01_02.do",
+  "verifiedAt": "2026-07-12"
+}

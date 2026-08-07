@@ -5,8 +5,15 @@
   "netAssetLimitKrw": 511000000,
   "depositLimitKrw": 300000000,
   "areaLimitSqm": 85,
-  "loanLimitText": "2.4억 (호당한도·전세금80%·담보한도 중 최소값)",
-  "rateRangeText": "연 1.2%~2.7% (소득×보증금 매트릭스, 다자녀 최대 -0.7%p)",
+  "loanLimitText": [
+    "최대 2.4억원",
+    "호당 한도, 전세금의 80%, 담보 한도 중 가장 적은 금액 적용"
+  ],
+  "rateRangeText": [
+    "연 1.2%~2.7% (소득×보증금 구간별 차등)",
+    "다자녀 우대 최대 -0.7%p"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021201.jsp",
-  "verifiedAt": "2026-07-10"
+  "verifiedAt": "2026-07-10",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }

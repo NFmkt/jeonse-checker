@@ -9,8 +9,15 @@
     "nonCapital": 400000000
   },
   "areaLimitSqm": 85,
-  "loanLimitText": "최대 2.4억 (25.6.27 이전 계약 3억)",
-  "rateRangeText": "연 1.3%~4.3% (소득 구간별 특례금리, 우대 최대 -0.5%p)",
+  "loanLimitText": [
+    "최대 2.4억원",
+    "2025년 6월 27일 이전 계약: 3억원 (경과조치)"
+  ],
+  "rateRangeText": [
+    "연 1.3%~4.3% (소득 구간별 특례금리)",
+    "추가 우대 최대 -0.5%p"
+  ],
   "sourceUrl": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05021401.jsp",
-  "verifiedAt": "2026-07-10"
+  "verifiedAt": "2026-07-10",
+  "bankList": ["우리은행", "KB국민은행", "신한은행", "NH농협은행", "하나은행"]
 }
