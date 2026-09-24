@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { Applicant } from '@/lib/eligibility'
+import { AREA_SQM_RANGE, DEPOSIT_MANWON_RANGE, type Prefill } from '@/lib/prefill'
 import { RangeSlider } from '@/components/RangeSlider'
 import { BracketList } from '@/components/BracketList'
 import {
@@ -20,6 +21,7 @@ import {
 
 type Props = {
   onComplete: (applicant: Applicant) => void
+  initialValues?: Prefill
 }
 
 const STEPS = [
@@ -166,13 +168,13 @@ function SelfReportButton({
   )
 }
 
-export function Questionnaire({ onComplete }: Props) {
+export function Questionnaire({ onComplete, initialValues }: Props) {
   const [stepIndex, setStepIndex] = useState(0)
   const [openInfoKey, setOpenInfoKey] = useState<string | null>(null)
   const [houseDecided, setHouseDecided] = useState<boolean | null>(null)
-  const [region, setRegion] = useState<Applicant['region'] | null>(null)
-  const [areaSqm, setAreaSqm] = useState(59)
-  const [depositManwon, setDepositManwon] = useState(20000)
+  const [region, setRegion] = useState<Applicant['region'] | null>(initialValues?.region ?? null)
+  const [areaSqm, setAreaSqm] = useState(initialValues?.areaSqm ?? 59)
+  const [depositManwon, setDepositManwon] = useState(initialValues?.depositManwon ?? 20000)
   const [housingOwnership, setHousingOwnership] = useState<Applicant['housingOwnership'] | null>(null)
   const [isNewlywed, setIsNewlywed] = useState(false)
   const [hasChildrenTwoOrMore, setHasChildrenTwoOrMore] = useState(false)
@@ -285,9 +287,9 @@ export function Questionnaire({ onComplete }: Props) {
               label="전용면적"
               value={areaSqm}
               onChange={setAreaSqm}
-              min={20}
-              max={120}
-              step={1}
+              min={AREA_SQM_RANGE.min}
+              max={AREA_SQM_RANGE.max}
+              step={AREA_SQM_RANGE.step}
               formatValue={(v) => `${v}㎡`}
               unitSuffix="이하"
               quickValues={[39, 49, 59, 74, 85, 102].map((v) => ({
@@ -305,9 +307,9 @@ export function Questionnaire({ onComplete }: Props) {
               label="전세보증금"
               value={depositManwon}
               onChange={setDepositManwon}
-              min={3000}
-              max={60000}
-              step={100}
+              min={DEPOSIT_MANWON_RANGE.min}
+              max={DEPOSIT_MANWON_RANGE.max}
+              step={DEPOSIT_MANWON_RANGE.step}
               formatValue={formatManwon}
               unitSuffix="이하"
               quickValues={[5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000].map((v) => ({

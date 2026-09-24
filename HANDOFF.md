@@ -11,6 +11,28 @@
 
 ---
 
+## 0-8. 쿼리파라미터 프리필 (2026-09-25, 브랜치 `feat/query-prefill`, 병합 대기)
+
+등기부 리포트 서비스가 `https://<host>/?deposit=150000000&region=capital&area=59` 형태로 연결하기 위한
+문답 초기값 프리필. 파서는 `lib/prefill.ts`(`parsePrefill`), 서버 페이지 `app/page.tsx`가
+`searchParams`(Promise)를 읽어 `components/HomeClient.tsx`(구 page.tsx 본문)에 넘기고,
+`Questionnaire`는 `initialValues`로 초기 state만 채운다(사용자가 전부 수정 가능).
+
+| 파라미터 | 계약 | 유효 조건 (아니면 조용히 무시, 기본값 유지) |
+|---|---|---|
+| `deposit` | 전세보증금, 원 단위 정수 문자열 | 숫자만, 100만원 단위, 3,000만~6억 (슬라이더 min/max/step과 동일) |
+| `region` | `capital` 또는 `non-capital` | 정확히 일치하는 값만 (한글·대소문자 변형 매핑 안 함) |
+| `area` | 전용면적 ㎡, 정수 문자열 | 20~120 정수 (소수 무시) |
+
+- 범위 밖·step 불일치 값은 클램프/반올림하지 않고 무시한다(다른 보증금으로 자격이 바뀌는 것 방지).
+  그래서 `150500000`(1억 5050만)처럼 100만원 단위가 아닌 값은 프리필되지 않는다.
+- 알 수 없는 파라미터, 중복 파라미터(배열)는 무시. 쿼리 없으면 기존 기본값(2억/59㎡/지역 미선택) 그대로.
+- 페이지가 정적(○)에서 서버 렌더링(ƒ)으로 바뀜(searchParams 사용).
+- 테스트 환경용으로 devDependencies에 jsdom, @testing-library/react, dom, user-event 추가(컴포넌트 테스트는 파일 상단 `// @vitest-environment jsdom`).
+- 호출 측(registry-report-service)은 `region`에 `capital`/`non-capital`만 보내야 한다. 그쪽에 4종 지역 개념이 있다면 변환은 호출 측 책임.
+
+---
+
 ## 0-7. ✅ 이슈 #6 완료 (2026-07-12)
 
 `superpowers:writing-plans` 계획서 → `EnterWorktree` 격리 워크트리 → `subagent-driven-development`로
