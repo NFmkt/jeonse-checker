@@ -26,7 +26,7 @@ describe('parsePrefill - deposit (원 단위 정수 문자열 -> 만원)', () =>
   })
 
   it('정수 문자열이 아니면 무시한다', () => {
-    for (const bad of ['', ' ', 'abc', '-150000000', '+150000000', '1.5e8', '150000000.0', '150,000,000', '15만', ' 150000000', '150000000 ', '0x10', 'NaN', 'Infinity']) {
+    for (const bad of ['', ' ', 'abc', '-150000000', '+150000000', '1.5e8', '150000000.0', '150,000,000', '15만', ' 150000000', '150000000 ', '0x10', 'NaN', 'Infinity', '0150000000']) {
       expect(parsePrefill({ deposit: bad }), bad).toEqual({})
     }
   })
@@ -60,7 +60,7 @@ describe('parsePrefill - area (전용면적 ㎡)', () => {
   })
 
   it('범위 밖, 소수, 음수, 문자열은 무시한다', () => {
-    for (const bad of ['19', '121', '0', '-59', '59.5', '84.97', '', 'abc', '5e1', ' 59']) {
+    for (const bad of ['19', '121', '0', '-59', '59.5', '84.97', '', 'abc', '5e1', ' 59', '059', 'Infinity', '-Infinity']) {
       expect(parsePrefill({ area: bad }), bad).toEqual({})
     }
   })

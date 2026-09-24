@@ -3,7 +3,8 @@ import type { Applicant } from '@/lib/eligibility'
 // 쿼리스트링으로 문답 초기값을 채우는 순수 파서.
 // 계약: deposit = 전세보증금(원 단위 정수 문자열), region = 'capital' | 'non-capital',
 // area = 전용면적(㎡, 정수). 유효하지 않은 값은 조용히 무시한다(클램프/추측 없음).
-// 아래 범위는 Questionnaire의 RangeSlider 설정과 같은 값이며 한쪽을 바꾸면 함께 바꿔야 한다.
+// 아래 범위 상수가 유일한 출처이며 Questionnaire의 RangeSlider도 이 상수를 import해 그대로 쓴다.
+// 숫자 문자열은 선행 0 없는 정규 정수 표기만 허용한다("0150000000"은 무시).
 
 export const DEPOSIT_MANWON_RANGE = { min: 3000, max: 60000, step: 100 } as const
 export const AREA_SQM_RANGE = { min: 20, max: 120, step: 1 } as const
@@ -19,7 +20,7 @@ export type RawSearchParams = Record<string, string | string[] | undefined>
 const WON_PER_MANWON = 10000
 
 function parseDigits(raw: string | string[] | undefined): number | null {
-  if (typeof raw !== 'string' || !/^\d+$/.test(raw)) return null
+  if (typeof raw !== 'string' || !/^(0|[1-9]\d*)$/.test(raw)) return null
   const n = Number(raw)
   return Number.isSafeInteger(n) ? n : null
 }

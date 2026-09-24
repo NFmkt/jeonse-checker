@@ -28,7 +28,9 @@
   그래서 `150500000`(1억 5050만)처럼 100만원 단위가 아닌 값은 프리필되지 않는다.
 - 알 수 없는 파라미터, 중복 파라미터(배열)는 무시. 쿼리 없으면 기존 기본값(2억/59㎡/지역 미선택) 그대로.
 - 페이지가 정적(○)에서 서버 렌더링(ƒ)으로 바뀜(searchParams 사용).
-- 테스트 환경용으로 devDependencies에 jsdom, @testing-library/react, dom, user-event 추가(컴포넌트 테스트는 파일 상단 `// @vitest-environment jsdom`).
+- 테스트 환경용으로 devDependencies에 jsdom, @testing-library/react, @testing-library/dom 추가(컴포넌트 테스트는 파일 상단 `// @vitest-environment jsdom`, 기본 환경은 node 유지).
+- "다시 하기"는 링크로 들어온 원래 프리필 값으로 돌아간다(사용자가 이전에 수정한 값은 유지되지 않음).
+- 100만원 단위가 아닌 보증금이나 범위 밖 값은 무시되므로, 호출 측은 링크를 만들기 전에 보증금을 가장 가까운 100만원 단위로 반올림하고 30,000,000~600,000,000원 범위 안에 두어야 한다. 선행 0이 붙은 숫자 문자열("0150000000")도 무시된다.
 - 호출 측(registry-report-service)은 `region`에 `capital`/`non-capital`만 보내야 한다. 그쪽에 4종 지역 개념이 있다면 변환은 호출 측 책임.
 
 ---
