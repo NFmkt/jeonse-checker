@@ -6,8 +6,67 @@
 >
 > - 위치: `my-claude/for_Release/loan-eligibility-service/`
 > - 작성일: 2026-07-09 (최종 갱신 2026-07-12)
-> - 상태: **`docs/issues.md` #1~#6 구현 완료, master에 병합됨**. 다음 작업은 #7(배포 + 시작 bat 파일, 마지막 이슈).
+> - 상태: **`docs/issues.md` #1~#6 구현 완료, master에 병합됨**(이후 프리필 0-8, 집 조건 API 0-9 추가). 다음 작업은 #7(배포 + 시작 bat 파일, 마지막 이슈).
 > - 상위 `my-claude/CLAUDE.md` 4단계 파이프라인 준수 대상.
+
+---
+
+## 0-9. 집 조건 판정 API (2026-09-30, 브랜치 `feat/house-conditions-api`, 병합 대기)
+
+등기부 리포트 서비스(registry-report-service) 01 장의 전세대출 카드가 서버 간 호출로 쓰는 API.
+나이·소득·자산 같은 개인 조건은 묻지 않고 **집 조건(보증금·전용면적·지역)만** 상품별로 판정한다.
+구현: `lib/houseConditions.ts`(`checkHouseConditions`), `app/api/house-conditions/route.ts`.
+보증금·면적 한도 비교는 `lib/eligibility.ts`의 `depositLimitReason`·`vulnerableDepositLimitReason`·`areaLimitReason`
+헬퍼로 뽑아 자격진단(`check*`)과 공유한다(사유 문자열은 기존과 같다).
+
+### 요청
+
+`POST /api/house-conditions`, `Content-Type: application/json`
+
+| 필드 | 타입 | 규칙 (아니면 400) |
+|---|---|---|
+| `depositKrw` | number | 필수. 양의 정수(원 단위, 안전 정수 범위) |
+| `areaSqm` | number | 선택. 양수(소수 가능). 없으면 면적 한도가 있는 상품은 `unknown` |
+| `region` | `"capital"` \| `"non-capital"` | 선택. 정확히 일치하는 값만. 없으면 지역별 한도 상품은 `unknown` |
+
+`null`, 문자열 숫자, 배열 본문, JSON이 아닌 본문은 모두 400 `{ "error": "잘못된 요청이에요." }`.
+
+### 응답 200
+
+```json
+{
+  "version": 1,
+  "summary": "fit | exceeds | partial | unknown",
+  "housingTypeChecked": false,
+  "products": [
+    { "productId": "bootmok-general", "productName": "...", "status": "fit | exceeds | depends | unknown",
+      "reasons": ["..."], "sourceUrl": "https://...", "verifiedAt": "2026-07-09" }
+  ],
+  "notEvaluated": [ { "productId": "bootmok-jeonse-damage", "productName": "..." } ]
+}
+```
+
+- `products`는 항상 이 순서: `bootmok-general`, `bootmok-youth`, `bootmok-newlywed`, `bootmok-newborn`, `general-bank-loan`.
+- `notEvaluated`(자기신고가 필요해 집 조건만으로 판정 안 함): `bootmok-jeonse-damage`, `bootmok-renewal-extension`, `bootmok-vulnerable-housing`.
+- `status`: `fit` 집 조건이 한도 안(`reasons`는 빈 배열) / `exceeds` 한도 초과(`reasons`는 자격진단과 같은 사유 문자열) /
+  `depends` 청년전용에서 면적이 만 25세 미만 단독세대주 한도(`areaLimitSqmUnder25Solo`)를 넘고 일반 한도 이하일 때
+  ("만 25세 미만 단독세대주는 전용면적 60㎡ 이하만 돼요") / `unknown` 판정에 필요한 집 값이 없음(`reasons`에 무엇이 없는지).
+- `unknown` 조건: 면적이 없으면 면적 한도가 있는 상품(시중은행 일반전세대출은 면적 한도가 없어 제외), 지역이 없으면 지역별 보증금 한도
+  상품(청년전용은 단일 한도라 제외). 하나라도 없으면 다른 값이 초과여도 `exceeds`로 단정하지 않고 `unknown`.
+- `summary`: 판정된 상품(`fit`·`exceeds`·`depends`)이 없으면 `unknown` / 다섯 상품이 전부 `exceeds`면 `exceeds` /
+  전부 `fit`이면 `fit` / 그 밖은 `partial`. `unknown`이 섞인 `fit`은 `fit`이 아니라 `partial`(확인하지 못한 상품을 맞다고 하지 않음).
+- `housingTypeChecked`는 항상 `false`. 주택 유형(아파트·다세대·오피스텔 등)은 규칙 데이터에 조건이 없어 판정하지 않는다.
+  호출 측은 "주택 유형은 확인하지 않은 결과"임을 화면에 밝혀야 한다. 규칙을 새로 만들려면 공식 출처 확인이 먼저다(`docs/issues.md` #8-1).
+- 한도 값은 `data/products/*.json`에서만 읽는다. 상품 JSON이 바뀌면 `sourceUrl`·`verifiedAt`도 응답에 함께 바뀐다.
+
+### 호출 측 책임
+
+- **서버 간 호출만.** CORS 헤더를 두지 않으므로 브라우저에서 직접 부르면 막힌다. 호출 측 서버가 대신 부른다.
+- 타임아웃(권장 5초)·네트워크 오류·2xx 아님·`version !== 1`·모르는 `summary`/`status`는 호출 측이 "확인 불가"로 처리한다.
+  이 API는 인증이 없으므로 호출 측이 결과를 근거로 확정 표현("대출 가능")을 쓰지 않는다. 판정은 집 조건뿐이라 참고용이다.
+- 지역(`region`)은 호출 측이 주소에서 계산해 `capital`/`non-capital`만 보낸다(4종 지역 개념이 있다면 변환은 호출 측 책임, 0-8과 같다).
+- 이 서비스는 요청 본문을 로그에 남기지 않는다. 호출 측도 주소·보증금이 든 요청/응답을 로그에 남기지 않는다.
+- 이 서비스는 아직 배포 전이라 운영에서는 호출이 실패하는 게 정상이다(`docs/issues.md` #7, #8-2).
 
 ---
 

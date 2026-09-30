@@ -175,3 +175,29 @@ Vercel에 배포하고, CLAUDE.md 필수 후처리 규칙에 따라 루트에 `�
 - [ ] Vercel 배포 완료, 실제 URL로 접속 가능
 - [ ] 루트에 `시작 {포트}.bat` 파일 존재, 기존 프로젝트들의 포트와 중복되지 않음
 - [ ] bat 파일 실행 시 브라우저가 자동으로 열리고 로컬 서버가 기동됨
+
+---
+
+## #8. 집 조건 판정 API (`POST /api/house-conditions`)
+
+**Type**: AFK
+**Blocked by**: None
+**Status**: ✅ 구현 완료 (2026-09-30, 브랜치 `feat/house-conditions-api`, `master` 병합은 사용자 확인 후)
+
+> 등기부 리포트 서비스(registry-report-service, 이슈 #65)의 전세대출 카드가 서버 간 호출로 쓴다.
+> 사람의 조건(나이·소득·자산)은 묻지 않고 집 조건(보증금·전용면적·지역)만 상품별로 판정한다.
+> 대출 규칙은 이 저장소 한 곳에만 둔다(호출 측에 복사 금지). 계약은 HANDOFF.md 0-9.
+
+### Acceptance criteria
+- [x] `lib/eligibility.ts`의 보증금·면적 한도 비교를 헬퍼로 추출(사유 문자열 불변, 기존 테스트 무수정 통과)
+- [x] `lib/houseConditions.ts` `checkHouseConditions`: 상품별 fit·exceeds·depends·unknown, 요약, 자기신고 상품은 `notEvaluated`
+- [x] `app/api/house-conditions/route.ts`: 입력 검증(400), 200 응답 `version: 1`, CORS 헤더 없음, 본문 미로깅
+- [x] 한도 값은 상품 JSON에서만 읽음(코드에 숫자 없음), 테스트도 JSON을 import해 경계를 만듦
+- [x] `npm test`, `npx tsc --noEmit`, `npm run build` 통과
+
+### 후속 (별도 이슈로 등록 필요)
+- **#8-1. 주택 유형 규칙**: 아파트·다세대·오피스텔 등 주택 유형별 대상 여부는 현재 규칙 데이터(`data/products/*.json`)에
+  조건이 없어 판정하지 않는다(응답에 `housingTypeChecked: false`). 규칙을 만들려면 공식 출처(nhuf.molit.go.kr 등)
+  확인이 먼저다. 확인 전에는 추정으로 채우지 않는다.
+- **#8-2. 운영 연결**: 이 API를 registry-report-service가 부르려면 이 서비스 배포와 운영 URL이 필요하다(#7, 사용자 액션).
+
