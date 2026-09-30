@@ -71,26 +71,34 @@ function evaluate(rule: HouseRule, house: HouseInput): HouseConditionProduct {
     verifiedAt: rule.verifiedAt,
   }
 
-  const regional = typeof rule.depositLimitKrw !== 'number'
+  const limit = rule.depositLimitKrw
+  const regional = typeof limit !== 'number'
   const hasAreaLimit = rule.areaLimitSqm !== undefined
 
+  // 값이 없어도 알고 있는 값으로 이미 한도를 넘었다면 exceeds다(넘은 것은 나머지 값과 무관하게 확실하다).
+  // 지역이 없으면 지역별 한도 중 가장 후한 쪽과 비교해, 그것도 넘을 때만 초과로 본다.
+  const exceeded: string[] = []
+  const regionForDeposit: Applicant['region'] = !regional
+    ? 'non-capital' // 단일 한도는 지역을 쓰지 않는다
+    : house.region ?? (limit.capital >= limit.nonCapital ? 'capital' : 'non-capital')
+  const depositReason = depositLimitReason(limit, {
+    depositKrw: house.depositKrw,
+    region: regionForDeposit,
+  })
+  if (depositReason) exceeded.push(depositReason)
+  if (rule.areaLimitSqm !== undefined && house.areaSqm !== null) {
+    const areaReason = areaLimitReason({ areaLimitSqm: rule.areaLimitSqm }, { areaSqm: house.areaSqm })
+    if (areaReason) exceeded.push(areaReason)
+  }
+  if (exceeded.length > 0) return { ...base, status: 'exceeds', reasons: exceeded }
+
+  // 넘지 않았는데 판정에 필요한 값이 없으면 unknown. 값이 없는 채로 fit이라 하지 않는다.
   const missing: string[] = []
   if (regional && house.region === null) missing.push('지역 정보가 없어 판정할 수 없어요')
   if (hasAreaLimit && house.areaSqm === null) missing.push('전용면적 정보가 없어 판정할 수 없어요')
   if (missing.length > 0) return { ...base, status: 'unknown', reasons: missing }
 
-  // 위에서 필요한 값이 있는지 확인했으므로, 필요 없는 값은 쓰이지 않는다.
-  const region = house.region ?? 'non-capital'
   const areaSqm = house.areaSqm ?? 0
-
-  const exceeded: string[] = []
-  const depositReason = depositLimitReason(rule.depositLimitKrw, { depositKrw: house.depositKrw, region })
-  if (depositReason) exceeded.push(depositReason)
-  if (rule.areaLimitSqm !== undefined) {
-    const areaReason = areaLimitReason({ areaLimitSqm: rule.areaLimitSqm }, { areaSqm })
-    if (areaReason) exceeded.push(areaReason)
-  }
-  if (exceeded.length > 0) return { ...base, status: 'exceeds', reasons: exceeded }
 
   // 청년전용: 만 25세 미만 단독세대주는 더 좁은 면적 한도가 적용된다. 나이·세대 구성은 모르므로 depends.
   const soloLimit = rule.areaLimitSqmUnder25Solo
@@ -106,11 +114,12 @@ function evaluate(rule: HouseRule, house: HouseInput): HouseConditionProduct {
 }
 
 function summarize(products: HouseConditionProduct[]): HouseConditionsSummary {
-  const judged = products.filter((p) => p.status !== 'unknown')
-  if (judged.length === 0) return 'unknown'
   if (products.every((p) => p.status === 'exceeds')) return 'exceeds'
   if (products.every((p) => p.status === 'fit')) return 'fit'
-  return 'partial'
+  // partial은 맞거나(fit) 조건에 따라 맞는(depends) 상품이 하나라도 있을 때만.
+  // 초과와 확인 불가만 있으면 맞는 상품이 확인된 게 없으므로 unknown이다.
+  if (products.some((p) => p.status === 'fit' || p.status === 'depends')) return 'partial'
+  return 'unknown'
 }
 
 export function checkHouseConditions(house: HouseInput): HouseConditionsResult {

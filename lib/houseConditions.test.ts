@@ -12,6 +12,14 @@ import { checkHouseConditions, type HouseConditionsResult } from './houseConditi
 
 const EOK = 100000000
 
+// 상품 JSON의 모든 보증금 한도 중 최댓값(어느 상품이 가장 후하든 상관없이 "전부 초과"를 만든다).
+const MAX_DEPOSIT_LIMIT = Math.max(
+  ...[bootmokGeneral, bootmokYouth, bootmokNewlywed, bootmokNewborn, generalBankLoan].flatMap((rule) => {
+    const limit = rule.depositLimitKrw
+    return typeof limit === 'number' ? [limit] : [limit.capital, limit.nonCapital]
+  })
+)
+
 function productOf(result: HouseConditionsResult, productId: string) {
   const found = result.products.find((p) => p.productId === productId)
   if (!found) throw new Error(`상품 없음: ${productId}`)
@@ -215,7 +223,7 @@ describe('checkHouseConditions: 요약', () => {
   })
 
   it('전부 exceeds면 exceeds', () => {
-    const deposit = generalBankLoan.depositLimitKrw.capital + 1
+    const deposit = MAX_DEPOSIT_LIMIT + 1
     const r = checkHouseConditions({ depositKrw: deposit, areaSqm: 30, region: 'capital' })
     expect(r.products.every((p) => p.status === 'exceeds')).toBe(true)
     expect(r.summary).toBe('exceeds')
@@ -248,6 +256,121 @@ describe('checkHouseConditions: 요약', () => {
       region: 'capital',
     })
     expect(productOf(r, bootmokYouth.id).status).toBe('depends')
+    expect(r.summary).toBe('partial')
+  })
+})
+
+describe('checkHouseConditions: 값이 없어도 이미 넘은 한도는 exceeds', () => {
+  it('면적이 없어도 보증금이 한도를 넘으면 그 상품은 exceeds(면적 unknown 사유 없음)', () => {
+    const deposit = bootmokGeneral.depositLimitKrw.capital + 1
+    const r = checkHouseConditions({ depositKrw: deposit, areaSqm: null, region: 'capital' })
+    const general = productOf(r, bootmokGeneral.id)
+    expect(general.status).toBe('exceeds')
+    expect(general.reasons).toEqual([
+      depositLimitReason(bootmokGeneral.depositLimitKrw, { depositKrw: deposit, region: 'capital' }),
+    ])
+    // 아직 넘지 않은 상품은 면적이 없어 unknown
+    expect(productOf(r, bootmokNewborn.id).status).toBe('unknown')
+  })
+
+  it('면적이 한도를 넘으면 지역이 없어도 exceeds', () => {
+    const area = bootmokGeneral.areaLimitSqm + 0.1
+    const r = checkHouseConditions({ depositKrw: EOK, areaSqm: area, region: null })
+    const general = productOf(r, bootmokGeneral.id)
+    expect(general.status).toBe('exceeds')
+    expect(general.reasons).toEqual([`전용면적 ${area}㎡로 한도 ${bootmokGeneral.areaLimitSqm}㎡ 초과`])
+    // 시중은행은 면적 한도가 없고 지역이 없어 unknown
+    expect(productOf(r, generalBankLoan.id).status).toBe('unknown')
+  })
+
+  it('지역이 없으면 가장 후한 지역 한도와 비교: 넘으면 exceeds, 두 한도 사이는 unknown', () => {
+    const { capital, nonCapital } = bootmokGeneral.depositLimitKrw
+    const lenient = Math.max(capital, nonCapital)
+    const strict = Math.min(capital, nonCapital)
+
+    const over = checkHouseConditions({ depositKrw: lenient + 1, areaSqm: 30, region: null })
+    const general = productOf(over, bootmokGeneral.id)
+    expect(general.status).toBe('exceeds')
+    expect(general.reasons).toEqual([
+      depositLimitReason(bootmokGeneral.depositLimitKrw, {
+        depositKrw: lenient + 1,
+        region: capital >= nonCapital ? 'capital' : 'non-capital',
+      }),
+    ])
+
+    const between = checkHouseConditions({ depositKrw: strict + 1, areaSqm: 30, region: null })
+    expect(productOf(between, bootmokGeneral.id).status).toBe('unknown')
+
+    const atLenient = checkHouseConditions({ depositKrw: lenient, areaSqm: 30, region: null })
+    expect(productOf(atLenient, bootmokGeneral.id).status).toBe('unknown')
+  })
+
+  it('필요한 값이 없으면 어떤 경우에도 fit이라 하지 않는다', () => {
+    for (const house of [
+      { depositKrw: 1, areaSqm: null, region: null },
+      { depositKrw: 1, areaSqm: 30, region: null },
+      { depositKrw: 1, areaSqm: null, region: 'capital' as const },
+    ]) {
+      const r = checkHouseConditions(house)
+      for (const p of r.products) {
+        const needsRegion = p.productId !== bootmokYouth.id
+        const needsArea = p.productId !== generalBankLoan.id
+        if ((needsRegion && house.region === null) || (needsArea && house.areaSqm === null)) {
+          expect(p.status).toBe('unknown')
+        }
+      }
+    }
+  })
+
+  it('보증금과 면적을 둘 다 넘으면 사유가 두 개', () => {
+    const deposit = bootmokGeneral.depositLimitKrw.capital + 1
+    const area = bootmokGeneral.areaLimitSqm + 1
+    const r = checkHouseConditions({ depositKrw: deposit, areaSqm: area, region: 'capital' })
+    const general = productOf(r, bootmokGeneral.id)
+    expect(general.status).toBe('exceeds')
+    expect(general.reasons).toEqual([
+      depositLimitReason(bootmokGeneral.depositLimitKrw, { depositKrw: deposit, region: 'capital' }),
+      `전용면적 ${area}㎡로 한도 ${bootmokGeneral.areaLimitSqm}㎡ 초과`,
+    ])
+  })
+})
+
+describe('checkHouseConditions: 요약 보강', () => {
+  it('exceeds와 unknown만 있으면 unknown(맞는 상품이 하나도 확인되지 않음)', () => {
+    // 지역이 없고, 보증금이 시중은행 이외 네 상품의 가장 후한 한도를 넘지만 시중은행의 가장 후한 한도는 넘지 않는다.
+    const fourLenient = Math.max(
+      ...[bootmokGeneral, bootmokYouth, bootmokNewlywed, bootmokNewborn].flatMap((rule) => {
+        const limit = rule.depositLimitKrw
+        return typeof limit === 'number' ? [limit] : [limit.capital, limit.nonCapital]
+      })
+    )
+    const bankLenient = Math.max(generalBankLoan.depositLimitKrw.capital, generalBankLoan.depositLimitKrw.nonCapital)
+    expect(fourLenient).toBeLessThan(bankLenient)
+    const r = checkHouseConditions({ depositKrw: fourLenient + 1, areaSqm: 30, region: null })
+    const statuses = r.products.map((p) => p.status)
+    expect(statuses.filter((s) => s === 'exceeds')).toHaveLength(4)
+    expect(productOf(r, generalBankLoan.id).status).toBe('unknown')
+    expect(r.summary).toBe('unknown')
+  })
+
+  it('exceeds와 fit이 섞이면 partial', () => {
+    const deposit = bootmokGeneral.depositLimitKrw.capital + 1
+    const r = checkHouseConditions({ depositKrw: deposit, areaSqm: 30, region: 'capital' })
+    expect(productOf(r, bootmokGeneral.id).status).toBe('exceeds')
+    expect(productOf(r, generalBankLoan.id).status).toBe('fit')
+    expect(r.summary).toBe('partial')
+  })
+
+  it('depends와 exceeds가 섞이면 partial', () => {
+    // 비수도권, 보증금은 일반 상품의 비수도권 한도를 1원 넘고(청년 단일 한도 이하), 면적은 청년 depends 구간
+    const r = checkHouseConditions({
+      depositKrw: bootmokGeneral.depositLimitKrw.nonCapital + 1,
+      areaSqm: bootmokYouth.areaLimitSqmUnder25Solo + 1,
+      region: 'non-capital',
+    })
+    expect(bootmokGeneral.depositLimitKrw.nonCapital + 1).toBeLessThanOrEqual(bootmokYouth.depositLimitKrw)
+    expect(productOf(r, bootmokYouth.id).status).toBe('depends')
+    expect(productOf(r, bootmokGeneral.id).status).toBe('exceeds')
     expect(r.summary).toBe('partial')
   })
 })
