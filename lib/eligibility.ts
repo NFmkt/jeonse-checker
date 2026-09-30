@@ -50,6 +50,61 @@ function formatManwon(krw: number): string {
   return `${Math.round(krw / 10000).toLocaleString()}만원`
 }
 
+/**
+ * 보증금 한도 비교. 한도는 상품 JSON의 depositLimitKrw 그대로(단일 값 또는 수도권/비수도권).
+ * 초과가 아니면 null. 사유 문자열은 checkXxx와 집 조건 판정(lib/houseConditions.ts)이 함께 쓴다.
+ */
+export function depositLimitReason(
+  limit: number | { capital: number; nonCapital: number },
+  house: Pick<Applicant, 'depositKrw' | 'region'>
+): string | null {
+  if (typeof limit === 'number') {
+    if (house.depositKrw > limit) {
+      return `전세보증금 ${formatEok(house.depositKrw)}으로 한도 ${formatEok(limit)} 초과`
+    }
+    return null
+  }
+  const regionLimit = house.region === 'capital' ? limit.capital : limit.nonCapital
+  if (house.depositKrw > regionLimit) {
+    const regionLabel = house.region === 'capital' ? '수도권' : '비수도권'
+    return `전세보증금 ${formatEok(house.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(regionLimit)} 초과`
+  }
+  return null
+}
+
+/** 주거취약계층 상품의 보증금 한도 비교(공공임대/민간임대 구분, 만원 단위 표기). */
+export function vulnerableDepositLimitReason(
+  limit: { publicHousing: number; privateHousing: number },
+  house: Pick<Applicant, 'depositKrw' | 'housingOwnership'>
+): string | null {
+  const isPublicHousing = house.housingOwnership === 'public-rental'
+  const depositLimit = isPublicHousing ? limit.publicHousing : limit.privateHousing
+  if (house.depositKrw > depositLimit) {
+    const housingLabel = isPublicHousing ? '공공임대' : '민간임대'
+    return `전세보증금 ${formatManwon(house.depositKrw)}으로 ${housingLabel} 한도 ${formatManwon(depositLimit)} 초과`
+  }
+  return null
+}
+
+/**
+ * 전용면적 한도 비교. options.under25Solo가 true이고 상품에 areaLimitSqmUnder25Solo가 있으면
+ * 그 한도를 쓴다(청년전용의 만 25세 미만 단독세대주 예외). 초과가 아니면 null.
+ */
+export function areaLimitReason(
+  rule: { areaLimitSqm: number; areaLimitSqmUnder25Solo?: number },
+  house: Pick<Applicant, 'areaSqm'>,
+  options: { under25Solo?: boolean } = {}
+): string | null {
+  const limit =
+    options.under25Solo && rule.areaLimitSqmUnder25Solo !== undefined
+      ? rule.areaLimitSqmUnder25Solo
+      : rule.areaLimitSqm
+  if (house.areaSqm > limit) {
+    return `전용면적 ${house.areaSqm}㎡로 한도 ${limit}㎡ 초과`
+  }
+  return null
+}
+
 export function checkHousingOwnership(applicant: Applicant): string | null {
   if (applicant.housingOwnership === 'one-house' || applicant.housingOwnership === 'multi-house') {
     return '무주택 요건 미충족(현재 주택을 소유하고 있어요)'
@@ -77,19 +132,11 @@ export function checkBootmokGeneral(applicant: Applicant): EligibilityResult {
     )
   }
 
-  if (applicant.areaSqm > rule.areaLimitSqm) {
-    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
-  }
+  const areaReason = areaLimitReason(rule, applicant)
+  if (areaReason) reasons.push(areaReason)
 
-  const depositLimit =
-    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
-
-  if (applicant.depositKrw > depositLimit) {
-    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
   return {
     productId: rule.id,
@@ -133,16 +180,11 @@ export function checkBootmokYouth(applicant: Applicant): EligibilityResult {
     )
   }
 
-  const areaLimit = applicant.age < 25 ? rule.areaLimitSqmUnder25Solo : rule.areaLimitSqm
-  if (applicant.areaSqm > areaLimit) {
-    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${areaLimit}㎡ 초과`)
-  }
+  const areaReason = areaLimitReason(rule, applicant, { under25Solo: applicant.age < 25 })
+  if (areaReason) reasons.push(areaReason)
 
-  if (applicant.depositKrw > rule.depositLimitKrw) {
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 한도 ${formatEok(rule.depositLimitKrw)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
   return {
     productId: rule.id,
@@ -181,18 +223,11 @@ export function checkBootmokNewlywed(applicant: Applicant): EligibilityResult {
     )
   }
 
-  const depositLimit =
-    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
-  if (applicant.depositKrw > depositLimit) {
-    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
-  if (applicant.areaSqm > rule.areaLimitSqm) {
-    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
-  }
+  const areaReason = areaLimitReason(rule, applicant)
+  if (areaReason) reasons.push(areaReason)
 
   return {
     productId: rule.id,
@@ -232,18 +267,11 @@ export function checkBootmokNewborn(applicant: Applicant): EligibilityResult {
     )
   }
 
-  const depositLimit =
-    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
-  if (applicant.depositKrw > depositLimit) {
-    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
-  if (applicant.areaSqm > rule.areaLimitSqm) {
-    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
-  }
+  const areaReason = areaLimitReason(rule, applicant)
+  if (areaReason) reasons.push(areaReason)
 
   return {
     productId: rule.id,
@@ -302,15 +330,11 @@ export function checkJeonseDamage(applicant: Applicant): EligibilityResult {
     )
   }
 
-  if (applicant.depositKrw > rule.depositLimitKrw) {
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 한도 ${formatEok(rule.depositLimitKrw)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
-  if (applicant.areaSqm > rule.areaLimitSqm) {
-    reasons.push(`전용면적 ${applicant.areaSqm}㎡로 한도 ${rule.areaLimitSqm}㎡ 초과`)
-  }
+  const areaReason = areaLimitReason(rule, applicant)
+  if (areaReason) reasons.push(areaReason)
 
   return {
     productId: rule.id,
@@ -348,14 +372,8 @@ export function checkRenewalExtension(applicant: Applicant): EligibilityResult {
   const housingReason = checkHousingOwnership(applicant)
   if (housingReason) reasons.push(housingReason)
 
-  const depositLimit =
-    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
-  if (applicant.depositKrw > depositLimit) {
-    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
   return {
     productId: rule.id,
@@ -393,16 +411,8 @@ export function checkVulnerableHousing(applicant: Applicant): EligibilityResult 
   const housingReason = checkHousingOwnership(applicant)
   if (housingReason) reasons.push(housingReason)
 
-  const isPublicHousing = applicant.housingOwnership === 'public-rental'
-  const depositLimit = isPublicHousing
-    ? rule.depositLimitKrw.publicHousing
-    : rule.depositLimitKrw.privateHousing
-  if (applicant.depositKrw > depositLimit) {
-    const housingLabel = isPublicHousing ? '공공임대' : '민간임대'
-    reasons.push(
-      `전세보증금 ${formatManwon(applicant.depositKrw)}으로 ${housingLabel} 한도 ${formatManwon(depositLimit)} 초과`
-    )
-  }
+  const depositReason = vulnerableDepositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
   return {
     productId: rule.id,
@@ -426,14 +436,8 @@ export function checkGeneralBankLoan(applicant: Applicant): EligibilityResult {
     reasons.push('본인 및 배우자 합산 1주택 이내 요건 미충족(2주택 이상 보유)')
   }
 
-  const depositLimit =
-    applicant.region === 'capital' ? rule.depositLimitKrw.capital : rule.depositLimitKrw.nonCapital
-  if (applicant.depositKrw > depositLimit) {
-    const regionLabel = applicant.region === 'capital' ? '수도권' : '비수도권'
-    reasons.push(
-      `전세보증금 ${formatEok(applicant.depositKrw)}으로 ${regionLabel} 한도 ${formatEok(depositLimit)} 초과`
-    )
-  }
+  const depositReason = depositLimitReason(rule.depositLimitKrw, applicant)
+  if (depositReason) reasons.push(depositReason)
 
   return {
     productId: rule.id,
